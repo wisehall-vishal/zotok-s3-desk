@@ -29,13 +29,15 @@ Write-Host "`n== 3/5 Static Web App linked to $Repo (a GitHub sign-in code will 
 $exists = az staticwebapp list -g $ResourceGroup --query "[?name=='$SiteName'] | length(@)" -o tsv
 if ($exists -eq "0") {
   az staticwebapp create -n $SiteName -g $ResourceGroup -l $SiteRegion --sku Free `
-    --source $Repo --branch main --app-location "app" --api-location "api" --output-location "" `
+    --source $Repo --branch main --app-location "app" --api-location "api" --output-location "/" `
     --login-with-github -o none
+  if ($LASTEXITCODE -ne 0) { throw "Static Web App creation failed (see the message above)." }
 }
 
 Write-Host "`n== 4/5 App settings" -ForegroundColor Cyan
 az staticwebapp appsettings set -n $SiteName -g $ResourceGroup --setting-names `
   "STORAGE_CONNECTION=$conn" "ALLOWED_DOMAIN=zotok.ai" -o none
+if ($LASTEXITCODE -ne 0) { throw "Setting app settings failed." }
 
 Write-Host "`n== 5/5 Done" -ForegroundColor Green
 $hostName = az staticwebapp show -n $SiteName -g $ResourceGroup --query defaultHostname -o tsv
