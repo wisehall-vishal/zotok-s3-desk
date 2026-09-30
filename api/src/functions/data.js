@@ -1,5 +1,5 @@
 const { app } = require("@azure/functions");
-const { WRITABLE, getTable, guard, desk, fromEntity, toEntity, validId } = require("../lib/common");
+const { WRITABLE, getTable, guard, desk, fromEntity, toEntity, validId, mirror } = require("../lib/common");
 
 // GET /api/data?c=meetings|meta|notes|drafts|flags|txmeta  -> {docs:[{id, data}]}
 app.http("data", {
@@ -20,7 +20,7 @@ app.http("data", {
 // GET/PUT/DELETE /api/doc/{coll}/{id} ; POST /api/doc/{coll} (add with new id)
 app.http("doc", {
   methods: ["GET", "PUT", "DELETE", "POST"], authLevel: "anonymous", route: "doc/{coll}/{id?}",
-  handler: async (request) => {
+  handler: async (request, context) => {
     const g = guard(request); if (g.error) return g.error;
     const coll = request.params.coll; let id = request.params.id;
     if (!WRITABLE.has(coll)) return { status: 403, jsonBody: { error: "Read-only collection" } };
@@ -42,6 +42,7 @@ app.http("doc", {
     body.by = g.user.id; body.byEmail = g.user.email;
     try { await t.upsertEntity(toEntity(coll, id, body), "Replace"); }
     catch (e) { return { status: e.status || 500, jsonBody: { error: e.message } }; }
+    await mirror(coll, id, body, (...a) => context.log(...a));
     await t.upsertEntity(toEntity("users", validId(g.user.id) ? g.user.id : "unknown", { email: g.user.email }), "Replace").catch(() => {});
     return { jsonBody: { id } };
   }

@@ -599,7 +599,8 @@ function renderDetail(){
   const i = state.step;
   const key = `${m.id}:${replyMode?"r":i}`;
   const d = buildDraft(m, i);
-  const draft = state.drafts[key] || GEN[key] || {subject:d.subject, body:d.body};
+  const sug = m.suggested && String(m.suggested.step) === (replyMode ? "r" : String(i)) ? m.suggested : null;
+  const draft = state.drafts[key] || GEN[key] || (sug ? {subject:sug.subject, body:sug.body} : {subject:d.subject, body:d.body});
   const gen = GEN[key];
   const st = replyMode ? "paused" : stepStatus(m,i);
   const dueDate = addDays(m.date, OFFSETS[i]);
@@ -636,11 +637,9 @@ function renderDetail(){
           <span class="chip ${stCls}">${stLabel}</span>
           ${replyMode ? "" : `<span class="mono" style="font-size:12px;color:var(--muted)">T+${OFFSETS[i]}</span>`}
           <span class="why">${esc(d.why)}</span>
+          <span class="why">${sug ? `<b>Tailored ${sug.at ? fmtShort(new Date(sug.at)) : ""}</b> from ${esc((sug.basis||[]).join(", ") || "the thread")}. Edit freely before sending.` : "Base template. It's tailored each morning once this account has notes, a transcript or a client reply."}</span>
         </div>
         ${!replyMode && i===2 ? `<div class="genbar"><label class="toggle"><input type="checkbox" id="scopeAgreed" ${m.scopeAgreed?"checked":""}> Scope agreed on a call or email</label></div>` : ""}
-          <div class="jmods">${Object.keys(MODULES).map(k => `<label><input type="checkbox" data-jmod="${k}" ${scopeOf(m).includes(k)?"checked":""}> ${MODULES[k].journeyName}</label>`).join("")}</div>
-          <div class="actions"><button class="btn primary" type="button" id="dlJourney">Download selected</button><span class="note">Standard SKUs are kept. Edit offline if needed.</span></div>
-        </div>
         <div class="field"><span class="k">To</span><span class="v" id="to">${esc(m.email)}</span><button class="mini" type="button" data-copy="to">Copy</button></div>
         <div class="field"><span class="k">CC</span><span class="v">grow@zotok.ai</span><span class="chip s-mute">required</span></div>
         <div class="field"><label class="k" for="subject">Subject</label><input id="subject" value="${esc(draft.subject)}" autocomplete="off"><button class="mini" type="button" data-copy="subject">Copy</button></div>
