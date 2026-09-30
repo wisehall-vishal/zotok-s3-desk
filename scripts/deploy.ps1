@@ -33,12 +33,9 @@ if ($exists -eq "0") {
     --login-with-github -o none
 }
 
-Write-Host "`n== 4/5 App settings (your Anthropic API key stays in Azure)" -ForegroundColor Cyan
-$sec = Read-Host "Paste the Anthropic API key (input hidden)" -AsSecureString
-$key = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec))
+Write-Host "`n== 4/5 App settings" -ForegroundColor Cyan
 az staticwebapp appsettings set -n $SiteName -g $ResourceGroup --setting-names `
-  "STORAGE_CONNECTION=$conn" "ALLOWED_DOMAIN=zotok.ai" "ANTHROPIC_API_KEY=$key" "ANTHROPIC_MODEL=claude-sonnet-5-5" -o none
-$key = $null
+  "STORAGE_CONNECTION=$conn" "ALLOWED_DOMAIN=zotok.ai" -o none
 
 Write-Host "`n== 5/5 Done" -ForegroundColor Green
 $hostName = az staticwebapp show -n $SiteName -g $ResourceGroup --query defaultHostname -o tsv

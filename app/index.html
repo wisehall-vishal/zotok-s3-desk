@@ -637,19 +637,7 @@ function renderDetail(){
           ${replyMode ? "" : `<span class="mono" style="font-size:12px;color:var(--muted)">T+${OFFSETS[i]}</span>`}
           <span class="why">${esc(d.why)}</span>
         </div>
-        <div class="genbar">
-          <button class="btn gen" type="button" id="genEmail" ${AI ? "" : "disabled title=\"Sign in with your ZoTok account to use this\""}>✦ Write with Claude</button>
-          <button class="btn" type="button" id="openJourney">Download journey</button>
-          ${!replyMode && i===2 ? `<label class="toggle"><input type="checkbox" id="scopeAgreed" ${m.scopeAgreed?"checked":""}> Scope agreed on a call or email</label>` : ""}
-          <span class="note" id="genStatus">${gen ? `Written by Claude ${gen.at ? fmtShort(new Date(gen.at)) : ""} from the notes, transcript and thread.` : "Base draft. Claude rewrites it using the notes, transcript and thread."}</span>
-        </div>
-        <div class="journeybox" id="journeyBox" hidden>
-          <div class="label">Brand a standard journey for ${esc(m.company)}</div>
-          <div class="jgrid">
-            <label for="jBrand">Brand name<input id="jBrand" value="${esc(m.company)}"></label>
-            <label for="jInit">Initials<input id="jInit" maxlength="3" value="${esc(initials(m.company))}"></label>
-            <label for="jInd">Industry line<input id="jInd" value="${esc(m.industry)}"></label>
-          </div>
+        ${!replyMode && i===2 ? `<div class="genbar"><label class="toggle"><input type="checkbox" id="scopeAgreed" ${m.scopeAgreed?"checked":""}> Scope agreed on a call or email</label></div>` : ""}
           <div class="jmods">${Object.keys(MODULES).map(k => `<label><input type="checkbox" data-jmod="${k}" ${scopeOf(m).includes(k)?"checked":""}> ${MODULES[k].journeyName}</label>`).join("")}</div>
           <div class="actions"><button class="btn primary" type="button" id="dlJourney">Download selected</button><span class="note">Standard SKUs are kept. Edit offline if needed.</span></div>
         </div>
@@ -671,8 +659,8 @@ function renderDetail(){
         <div>
           <h4 class="label">Transcript</h4>
           ${m.tx==="available" ? `<div class="tx"><span class="mono" style="font-size:12px">${esc(m.txInfo.name)}</span><a href="${esc(m.txInfo.webUrl)}" target="_blank" rel="noopener">Open in SharePoint ↗</a><span style="font-size:12px;color:var(--muted)">Recorded ${m.txInfo.date ? fmt(pISO(m.txInfo.date)) : ""}. Pains and numbers below come from here.</span></div>`
-            : m.tx==="uploaded" ? `<div class="tx"><span class="mono" style="font-size:12px">${esc(m.txName||"transcript")}</span><span style="font-size:12px;color:var(--muted)">Uploaded here. "Write with Claude" reads it now; the daily sync copies it to SharePoint.</span></div>`
-            : `<div class="drop" id="drop"><div>Drop the transcript here or <label for="txfile">choose a file</label></div><div style="font-size:12px;margin-top:4px">.docx, .txt or .vtt · Claude uses it for drafts; the daily sync files it in SharePoint › Transcripts</div><input type="file" id="txfile" accept=".docx,.txt,.vtt"></div>`}
+            : m.tx==="uploaded" ? `<div class="tx"><span class="mono" style="font-size:12px">${esc(m.txName||"transcript")}</span><span style="font-size:12px;color:var(--muted)">Uploaded here and saved with this customer.</span></div>`
+            : `<div class="drop" id="drop"><div>Drop the transcript here or <label for="txfile">choose a file</label></div><div style="font-size:12px;margin-top:4px">.docx, .txt or .vtt · saved with this customer</div><input type="file" id="txfile" accept=".docx,.txt,.vtt"></div>`}
         </div>
         <div>
           <h4 class="label">What we heard</h4>
@@ -693,7 +681,7 @@ function renderDetail(){
             <textarea id="noteText" rows="3" placeholder="What changed since the demo? Objections, who decides, dates, numbers…"></textarea>
             <button class="btn" type="button" id="saveNote" ${DB ? "" : "disabled"}>Save note</button>
           </div>
-          <ul class="notes">${m.notesList.length ? m.notesList.map(n => `<li><span class="chip s-mute">${esc(n.kind||"Note")}</span> <span class="mono" style="font-size:11px;color:var(--muted)">${n.at ? fmtShort(new Date(n.at)) : ""} · ${esc(nameOf(n.by))}</span><div>${esc(n.text)}</div></li>`).join("") : `<li class="empty-note">No notes yet. Anything saved here feeds "Write with Claude".</li>`}</ul>
+          <ul class="notes">${m.notesList.length ? m.notesList.map(n => `<li><span class="chip s-mute">${esc(n.kind||"Note")}</span> <span class="mono" style="font-size:11px;color:var(--muted)">${n.at ? fmtShort(new Date(n.at)) : ""} · ${esc(nameOf(n.by))}</span><div>${esc(n.text)}</div></li>`).join("") : `<li class="empty-note">No notes yet. Notes are shared with the team.</li>`}</ul>
         </div>
         ${m.meetings.length > 1 ? `<p style="margin:0;font-size:12.5px"><span class="label">Meetings</span><br>${m.meetings.map(d => fmt(pISO(d))).join(" · ")}</p>` : ""}
         ${m.notes ? `<p style="margin:0;font-size:12.5px;color:var(--muted)"><span class="label">Data notes</span><br>${esc(m.notes)}</p>` : ""}
@@ -811,7 +799,7 @@ async function takeFile(f){
     const at = new Date().toISOString();
     await DB.doc("transcripts/"+m.id).set({meetingId:m.id, name, original:f.name, text, at, by:ME||"", sharepointSynced:false});
     await DB.doc("txmeta/"+m.id).set({meetingId:m.id, name, at, chars:text.length});
-    toast("Transcript saved. Write with Claude will use it.");
+    toast("Transcript saved.");
   }catch(e){ toast("Couldn't read that file. Try .txt, .vtt or .docx."); }
 }
 function initials(n){ return (n.replace(/\b(pvt|private|ltd|limited|llp|india|the)\b/ig,"").trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("") || n.slice(0,2)).toUpperCase(); }
