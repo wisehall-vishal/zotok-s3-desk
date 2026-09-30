@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>S3 Follow-up Desk</title>
+<style>*{box-sizing:border-box}html,body{margin:0}body{font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: work queue on the left, the selected meeting's composer + context on the right. Team pulse replaces both. */
+:root{
+  --bg:#F5F7F6; --surface:#FFFFFF; --sunk:#EDF1EF; --line:#D8E0DC; --line-strong:#B9C6C0;
+  --fg:#15211C; --muted:#5B6B64; --faint:#8A9892;
+  --accent:#0E6B55; --accent-ink:#FFFFFF; --accent-soft:#DDEFE8;
+  --due:#9A6400; --due-soft:#FBEFD6;
+  --late:#B3261E; --late-soft:#FBE3E0;
+  --ok:#1F7A45; --ok-soft:#DFF2E6;
+  --pause:#4B5BA8; --pause-soft:#E3E7F8;
+  --future:#C9D3CE;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1613; --surface:#16201C; --sunk:#1C2823; --line:#2A3832; --line-strong:#3B4C45;
+  --fg:#E4ECE8; --muted:#9DB0A8; --faint:#6F8279;
+  --accent:#4FC39F; --accent-ink:#06231A; --accent-soft:#173A2F;
+  --due:#F0B64A; --due-soft:#3A2D12;
+  --late:#FF8A80; --late-soft:#40201D;
+  --ok:#6FD49A; --ok-soft:#173424;
+  --pause:#A3B1F5; --pause-soft:#232A4A;
+  --future:#34443D; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --surface:#16201C; --sunk:#1C2823; --line:#2A3832; --line-strong:#3B4C45;
+  --fg:#E4ECE8; --muted:#9DB0A8; --faint:#6F8279;
+  --accent:#4FC39F; --accent-ink:#06231A; --accent-soft:#173A2F;
+  --due:#F0B64A; --due-soft:#3A2D12;
+  --late:#FF8A80; --late-soft:#40201D;
+  --ok:#6FD49A; --ok-soft:#173424;
+  --pause:#A3B1F5; --pause-soft:#232A4A;
+  --future:#34443D; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1480px;margin:0 auto;padding-inline:20px;padding-block:16px 40px}
+@media (max-width:600px){.wrap{padding-inline:16px}}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand h1{font-family:var(--f-display);font-size:22px;margin:0;letter-spacing:-.01em}
+.brand .sub{color:var(--muted);font-size:13px}
+.today{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.repsel{display:flex;align-items:center;gap:8px}.repsel select{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:6px 28px 6px 10px;font-weight:500;min-width:170px}
+.reps button{border:0;background:transparent;padding:5px 12px;border-radius:999px;font-size:13px;color:var(--muted)}
+.reps button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.sample{font-size:12px;color:var(--due);background:var(--due-soft);padding:3px 10px;border-radius:999px}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-block:16px}
+.kpi{background:var(--surface);padding:10px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi b{font-family:var(--f-display);font-size:26px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.late b{color:var(--late)} .kpi.due b{color:var(--due)} .kpi.pause b{color:var(--pause)}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:last-child{grid-column:1/-1}}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:8px 14px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tabs .count{font-family:var(--f-mono);font-size:11px;background:var(--sunk);padding:1px 6px;border-radius:999px;margin-left:6px}
+
+/* Main grid */
+.work{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.work{grid-template-columns:minmax(0,1fr)}}
+.list{display:flex;flex-direction:column;gap:14px;min-width:0}
+.group h3{margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.group h3 .label{color:var(--fg)}
+.pip{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.rows{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:none;text-align:left;width:100%}
+.row:first-child{border-top:0}
+.row:hover{background:var(--sunk)}
+.row[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.row .co{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .meta{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
+.row .step{font-family:var(--f-mono);font-size:12px;font-weight:500;align-self:center}
+.empty{padding:14px;color:var(--muted);font-size:13px;border:1px dashed var(--line-strong);border-radius:var(--r)}
+
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:4px;letter-spacing:.02em;white-space:nowrap}
+.t-AC1{background:#E9E3F7;color:#4F3A8C} .t-ICP{background:#DCEBF7;color:#1D5487} .t-AC2{background:#F7E4D8;color:#8A3E12}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .t-AC1{background:#2C2445;color:#C7B8F2} :root:not([data-theme="light"]) .t-ICP{background:#1A3044;color:#A6CDF0} :root:not([data-theme="light"]) .t-AC2{background:#3D2616;color:#F2B996}}
+:root[data-theme="dark"] .t-AC1{background:#2C2445;color:#C7B8F2} :root[data-theme="dark"] .t-ICP{background:#1A3044;color:#A6CDF0} :root[data-theme="dark"] .t-AC2{background:#3D2616;color:#F2B996}
+.s-due{background:var(--due-soft);color:var(--due)} .s-late{background:var(--late-soft);color:var(--late)}
+.s-ok{background:var(--ok-soft);color:var(--ok)} .s-pause{background:var(--pause-soft);color:var(--pause)}
+.s-mute{background:var(--sunk);color:var(--muted)}
+
+/* Cadence dots */
+.dots{display:inline-flex;gap:3px}
+.dot{width:9px;height:9px;border-radius:2px;background:var(--future)}
+.dot.sent{background:var(--ok)} .dot.due{background:var(--due)} .dot.overdue{background:var(--late)} .dot.paused{background:var(--pause)}
+.dot.upcoming{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line-strong)}
+
+/* Meetings by date */
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 6px}
+.dayhead .d{font-family:var(--f-mono);font-size:12px;font-weight:500}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.filters button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* Detail */
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.dhead{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start}
+.dhead h2{font-family:var(--f-display);font-size:24px;margin:0;line-height:1.15;letter-spacing:-.01em}
+.dhead .who{color:var(--muted);font-size:13px}
+.dhead .facts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.dhead .right{margin-left:auto;text-align:right}
+.banner{margin:14px 20px 0;padding:10px 12px;border-radius:6px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.banner.pause{background:var(--pause-soft);color:var(--fg)} .banner.ok{background:var(--ok-soft);color:var(--fg)} .banner.warn{background:var(--due-soft);color:var(--fg)}
+.banner strong{display:block}
+.banner q{display:block;margin-top:4px;font-style:italic;color:var(--muted);quotes:none}
+
+.dbody{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0}
+@media (max-width:1260px){.dbody{grid-template-columns:minmax(0,1fr)}}
+.composer{padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.side{border-left:1px solid var(--line);padding:16px 18px 20px;display:flex;flex-direction:column;gap:18px;min-width:0;background:var(--bg)}
+@media (max-width:1260px){.side{border-left:0;border-top:1px solid var(--line)}}
+
+.stepbar{display:flex;gap:4px;flex-wrap:wrap}
+.stepbar button{font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:5px;padding:3px 7px;color:var(--muted);position:relative}
+.stepbar button.sent{color:var(--ok);border-color:transparent;background:var(--ok-soft)}
+.stepbar button.due{color:var(--due);border-color:var(--due)}
+.stepbar button.overdue{color:var(--late);border-color:var(--late)}
+.stepbar button.paused{color:var(--pause);border-color:transparent;background:var(--pause-soft)}
+.stepbar button[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:1px}
+.stephead{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.stephead h3{margin:0;font-size:16px;font-weight:600}
+.stephead .why{color:var(--muted);font-size:13px;flex-basis:100%}
+
+.field{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.field .k{font-size:12px;color:var(--muted)}
+.field .v{font-family:var(--f-mono);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.field input{border:0;background:transparent;font-weight:600;padding:2px 0;width:100%;min-width:0}
+.field input:focus{outline:none;box-shadow:0 1px 0 var(--accent)}
+.mini{border:1px solid var(--line);background:var(--surface);border-radius:5px;font-size:12px;padding:2px 8px;color:var(--muted)}
+.mini:hover{color:var(--fg);border-color:var(--line-strong)}
+textarea#body{width:100%;min-height:360px;resize:vertical;border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:12px 14px;line-height:1.6;font-size:14px}
+textarea#body:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.check{font-size:12px;padding:3px 8px;border-radius:5px;display:inline-flex;gap:5px;align-items:center}
+.check::before{font-weight:700}
+.check.pass{background:var(--ok-soft);color:var(--ok)} .check.pass::before{content:"✓"}
+.check.fail{background:var(--late-soft);color:var(--late)} .check.fail::before{content:"!"}
+.check.na{background:var(--sunk);color:var(--faint)} .check.na::before{content:"–"}
+
+.attach{display:flex;flex-direction:column;gap:6px}
+.attach label{display:flex;gap:8px;align-items:center;font-size:13px}
+.attach .src{color:var(--faint);font-size:12px}
+
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:4px}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:7px 14px;font-weight:500}
+.btn:hover{border-color:var(--fg)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.actions .note{font-size:12px;color:var(--muted);margin-left:auto}
+
+.side h4{margin:0 0 8px}
+.tx{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.tx a{color:var(--accent);font-weight:500;text-decoration:none;word-break:break-word}
+.tx a:hover{text-decoration:underline}
+.drop{border:1.5px dashed var(--line-strong);border-radius:6px;padding:14px;text-align:center;font-size:13px;color:var(--muted);background:var(--surface)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop label{color:var(--accent);font-weight:600;cursor:pointer}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.heard{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.heard li{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px}
+.heard .k{color:var(--muted);font-size:12px}
+.tl{list-style:none;margin:0;padding:0;font-size:12.5px}
+.tl li{display:grid;grid-template-columns:30px 50px minmax(0,1fr) auto;gap:6px;align-items:center;padding:4px 0;border-bottom:1px dotted var(--line)}
+.tl li:last-child{border-bottom:0}
+.tl .m{font-family:var(--f-mono);font-weight:500}
+.tl .dt{font-family:var(--f-mono);color:var(--muted)}
+.tip{font-size:12.5px;color:var(--muted);border-left:2px solid var(--accent);padding-left:10px}
+
+/* Team pulse */
+.pulse{display:flex;flex-direction:column;gap:20px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--sunk)}
+td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+th.n{text-align:right}
+tr:last-child td{border-bottom:0}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--accent);vertical-align:middle;margin-left:8px}
+.pulse p{margin:0;color:var(--muted);font-size:13px;max-width:70ch}
+
+.foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px}
+.foot a{color:var(--muted)}
+
+.panes{display:flex;gap:2px;border-bottom:1px solid var(--line)}
+.panes button{border:0;background:none;padding:6px 12px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;font-size:13px}
+.panes button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg)}
+.threadbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.threadbar .mini{margin-left:auto}
+.thread{display:flex;flex-direction:column;gap:8px}
+.mail{border:1px solid var(--line);border-radius:6px;background:var(--surface);min-width:0}
+.mail.in{border-left:3px solid var(--pause)}
+.mail.target{box-shadow:0 0 0 2px var(--accent)}
+.mail summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;align-items:center}
+.mail summary::-webkit-details-marker{display:none}
+.mail summary:hover{background:var(--sunk)}
+.mail .from{font-weight:600;font-size:13px;white-space:nowrap}
+.mail .subj{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.mail .when{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.mail .snip{grid-column:1/-1;color:var(--muted);font-size:12.5px;overflow:hidden;white-space:nowrap;display:flex;gap:8px;align-items:center;min-width:0}
+.mail .snip .txt{overflow:hidden;text-overflow:ellipsis}
+.mail[open] .snip .txt{display:none}
+.mhead{padding:6px 12px 8px;font-size:12px;color:var(--muted);font-family:var(--f-mono);border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);display:flex;flex-direction:column;gap:1px;overflow-wrap:anywhere}
+.mbody{padding:12px 14px;white-space:pre-wrap;line-height:1.6;overflow-wrap:anywhere}
+.mail .checks{padding:0 12px 12px}
+.next{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1.5px dashed var(--line-strong);border-radius:6px;padding:10px 12px;font-size:13px}
+.genbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn.gen{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.gen[disabled]{background:var(--sunk);color:var(--muted);border-color:var(--line)}
+.genbar .note{font-size:12px;color:var(--muted)}
+.toggle{display:inline-flex;gap:6px;align-items:center;font-size:13px}
+.journeybox{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.jgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.jgrid label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.jgrid input{border:1px solid var(--line);border-radius:5px;padding:5px 8px;background:var(--surface);color:var(--fg)}
+.jmods{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.noteform{display:flex;flex-direction:column;gap:6px}
+.noteform select,.noteform textarea{border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:var(--surface);color:var(--fg);font-size:13px;resize:vertical}
+.noteform .btn{align-self:flex-start;padding:5px 12px}
+.notes{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.notes li{border-left:2px solid var(--line-strong);padding-left:8px;display:flex;flex-direction:column;gap:2px}
+.notes div{white-space:pre-wrap;overflow-wrap:anywhere}
+.empty-note{color:var(--faint);border:0!important;padding:0!important}
+.boot{padding:40px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line-strong);border-radius:var(--r)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.2);z-index:10;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .18s ease-out}@keyframes up{from{transform:translate(-50%,8px);opacity:0}}}
+</style>
+<script src="/shim.js"></script>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>S3 Follow-up Desk</h1><span class="sub">ZoTok · post-demo email cadence</span></div>
+    <span class="sample" id="syncLbl" title="Refreshed daily from Raw S3 Demo Completed.csv, the Transcripts folder and grow@zotok.ai">Connecting…</span>
+    <span class="today mono" id="today"></span>
+    <label class="repsel" for="repSel"><span class="label">Salesperson</span><select id="repSel"></select></label>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Today at a glance"></section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" id="tab-today" aria-selected="true" data-tab="today">Due today<span class="count" id="c-today"></span></button>
+    <button role="tab" id="tab-meet" aria-selected="false" data-tab="meet">Meetings by date<span class="count" id="c-meet"></span></button>
+    <button role="tab" id="tab-pulse" aria-selected="false" data-tab="pulse">Team pulse</button>
+  </nav>
+
+  <main id="main"></main>
+
+  <footer class="foot">
+    <span>Cadence: M1 T+1 · M2 T+2 · M3 T+4 · M4 T+6 · M5–M10 twice a week to T+27 · then remarketing</span>
+    <span>Every email CCs grow@zotok.ai. Any email to the client seen there moves the cadence forward, template or not.</span>
+    <a href="https://zonoapp-my.sharepoint.com/:x:/g/personal/wisehall_zotok_ai/IQDn3Zgv0y2WT4osS_4MCmG1AWHoZHdGD3iBFaNJxewB5qg?e=MRmznm" target="_blank" rel="noopener">Raw S3 Demo Completed.csv</a>
+    <a href="https://zonoapp-my.sharepoint.com/:f:/g/personal/wisehall_zotok_ai/IgAYFYr8FrhlSJOvKAGb6A5PAZnwVyEJQ6TkV8mVWE5mz7E?e=94NfUf" target="_blank" rel="noopener">Transcripts folder</a>
+  </footer>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(() => {
+const TX_FOLDER = "https://zonoapp-my.sharepoint.com/:f:/g/personal/wisehall_zotok_ai/IgAYFYr8FrhlSJOvKAGb6A5PAZnwVyEJQ6TkV8mVWE5mz7E?e=94NfUf";
+const OFFSETS = [1,2,4,6,9,13,16,20,23,27];
+const STEP_NAMES = ["Understanding + scope + proof","Workflow + price range (gate)","Firm quote or scope nudge","Cost of delay + paid first phase","Pain + case study","Pain + case study","Pain + case study","Season + reach","Pain + case study","Close the file"];
+const HOLIDAYS = ["2026-10-02","2026-10-20","2026-11-08","2026-11-09"];
+const WORD_LIMIT = {AC1:180, ICP:250, AC2:250};
+
+// REPS and DATA_RAW are defined below with the live September data.
+
+const CASES = {
+  "ITC Classmate":"ITC Classmate runs order-to-cash for its channel on WhatsApp: product info, schemes, orders, invoices, ledgers and payment reminders. They started with one use case and expanded from there.",
+  "Haldiram's":"Haldiram's started with its Nagpur division: retailers get the catalogue, ask questions, order, pay and earn points on WhatsApp, with no app and no sales visit for small orders.",
+  "JK Cement":"JK Cement's distributors get credit notes, ledgers and outstanding amounts straight from SAP on WhatsApp. No SAP login and no separate DMS.",
+  "Hindware":"Hindware runs its field team inside WhatsApp groups: clock-in and out, orders, ledgers, payments, competitor intel and expense claims, with no SFA app to install.",
+  "SKF":"Mechanics ask SKF for parts in their own words, even by voice note, and get a priced quote from a 5,000+ SKU catalogue in the chat.",
+  "Veeba":"For Veeba, ZoTok maps 22,000+ customer aliases across 250 products and parses orders with 95% accuracy.",
+  "Birla Nu":"Birla Nu runs a secondary loyalty scheme for 50k+ retailers, who upload invoices on WhatsApp to earn points.",
+  "Orient Electric":"Orient Electric linked SAP directly to WhatsApp, so dealers check order status in real time without calling support.",
+  "Samunnati":"Samunnati runs a 24x7 AI agent that supports farmers in 10+ local languages on WhatsApp.",
+  "IndiaGate":"IndiaGate uses ZoTok to take orders from long-tail retailers who were previously too expensive to reach manually, all on WhatsApp."
+};
+const CASE_BY_INDUSTRY = {
+  "FMCG":["Haldiram's","IndiaGate","Veeba","ITC Classmate"],
+  "Pharma":["Veeba","JK Cement","Haldiram's"],
+  "Agri":["IndiaGate","Samunnati","Haldiram's"],
+  "Electrical":["Orient Electric","Hindware","SKF"],
+  "Auto & Industrial":["SKF","Orient Electric","JK Cement"],
+  "Construction":["JK Cement","Birla Nu","Hindware"],
+  "Apparel":["ITC Classmate","Birla Nu","Haldiram's"],
+  "Commodities":["JK Cement","Veeba","Samunnati"]
+};
+
+const REPS = {"Abhigna": {"name": "Abhigna", "email": "abhigna@zotok.ai"}, "Anshul": {"name": "Anshul", "email": "anshul.shrivastav@zotok.ai"}, "Bhagyasree": {"name": "Bhagyasree", "email": "bhagyasree@zotok.ai"}, "Bhavana": {"name": "Bhavana", "email": "bhavana@zotok.ai"}, "Hiranya": {"name": "Hiranya", "email": "hiranya.reddy@zotok.ai"}, "Nisheeth": {"name": "Nisheeth", "email": "nisheeth.sawarkar@zotok.ai"}, "Ravi Kishore": {"name": "Ravi Kishore", "email": "ravi.kishore@zotok.ai"}, "Rohith": {"name": "Rohith", "email": "rohith.kumar@zotok.ai"}, "Sagar": {"name": "Sagar", "email": "sagar@zotok.ai"}, "Sai Kishore": {"name": "Sai Kishore", "email": "kishore@zotok.ai"}, "Shashank": {"name": "Shashank", "email": "shashank@zotok.ai"}, "Vishal": {"name": "Vishal", "email": "wisehall@zotok.ai"}};
+// Customer data lives in the page database (collection "meetings"), refreshed daily from the demo tracker, transcripts and grow@.
+
+
+// ---------- date helpers ----------
+const DAY = 864e5;
+const T0 = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+const addDays = (d,n) => new Date(d.getTime() + n*DAY);
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmt = d => `${WD[d.getDay()]} ${d.getDate()} ${MO[d.getMonth()]}`;
+const fmtShort = d => `${d.getDate()} ${MO[d.getMonth()]}`;
+const sameDay = (a,b) => a.getTime() === b.getTime();
+function slots(ref = T0){
+  // next two working days (Mon–Fri, skipping holidays), starting the day after tomorrow
+  const out = []; let d = addDays(ref, 2);
+  while (out.length < 2){
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6 && !HOLIDAYS.includes(iso(d))) out.push(d);
+    d = addDays(d, 1);
+  }
+  return [`${fmt(out[0])}, 11:00`, `${fmt(out[1])}, 16:00`];
+}
+const SLOTS = slots();
+
+const pISO = s => { const [y,mo,d] = s.split("-").map(Number); return new Date(y, mo-1, d); };
+let MEETINGS = [];
+const NOTES = {}, GEN = {}, FLAGS = {}, TXUP = {};
+function toMeeting(d){
+  const date = pISO(d.date);
+  const notes = NOTES[d.id] || [];
+  return Object.assign({}, d, {
+    date, daysAgo: Math.round((T0 - date)/DAY),
+    meetings: d.meetings || [d.date], emails: d.emails || [],
+    rawPains: d.pains || [], rawModules: d.modules || [],
+    pains: [(d.pains||[])[0] || "[their main problem, in their words]", (d.pains||[])[1] || "[second problem, with a number]"],
+    modules: [(d.modules||[])[0] || "[first thing we switch on]", (d.modules||[])[1] || "[second thing we switch on]"],
+    numbers: d.numbers || "[their numbers]", erp: d.erp || "your ERP", promised: d.promised || "next steps", dm: d.dm || "",
+    contact: d.contact || "[Name]", email: d.email || "(no client email found in grow@)", role: d.role || "",
+    price: {setup:"[setup ₹]", monthly:"[monthly ₹]"},
+    tx: d.tx ? "available" : (TXUP[d.id] ? "uploaded" : "missing"), txInfo: d.tx, txName: TXUP[d.id]?.name,
+    reply: d.reply ? {date: pISO(d.reply.date), text: d.reply.text} : null,
+    stage: d.stage || "S3", inbox: [], sent: d.sent || 0,
+    notesList: notes, notesText: notes.map(n => n.text).join(" "),
+    scopeAgreed: !!(FLAGS[d.id]?.scopeAgreed)
+  });
+}
+let RAW = [];
+function rebuild(){ MEETINGS = RAW.map(toMeeting); }
+
+// ---------- state ----------
+const state = { rep:"All", tab:"today", sel:null, step:null, filter:"all", drafts:{}, sentOverride:{}, pane:"draft", openStep:null };
+try { const r = localStorage.getItem("s3desk.rep"); if (r) state.rep = r; } catch(e){}
+
+// grow@ is the source of truth: any outbound email to the client that grow@ sees counts as the next step,
+// whether it came from the desk draft or was written from scratch. One step per calendar day.
+function detected(m){ return []; }
+function sentCount(m){ return Math.min(10, Math.max(state.sentOverride[m.id] ?? 0, m.sent)); }
+function sentDate(m,i){ const e = (m.emails||[]).find(x => x.dir==="out" && x.step===i); return e ? pISO(e.date) : null; }
+function sentSource(m,i){ return i < m.sent ? {own:false} : null; }
+function stepStatus(m,i){
+  const due = addDays(m.date, OFFSETS[i]);
+  if (i < sentCount(m)) return "sent";
+  if (m.stage !== "S3") return "paused";
+  if (m.reply && m.reply.date >= addDays(m.date, OFFSETS[Math.max(0,i-1)]) && !m.replyHandled) return "paused";
+  if (due < T0) return "overdue";
+  if (sameDay(due, T0)) return "due";
+  return "upcoming";
+}
+function currentStep(m){ const s = sentCount(m); return s >= 10 ? null : s; }
+function bucket(m){
+  if (m.stage !== "S3") return "moved";
+  if (m.reply && !m.replyHandled) return "reply";
+  const s = currentStep(m); if (s === null) return "done";
+  const st = stepStatus(m,s);
+  return st === "overdue" ? "late" : st === "due" ? "due" : "later";
+}
+const mine = () => MEETINGS.filter(m => state.rep === "All" || m.rep === state.rep);
+
+// ---------- drafts: M1 understanding + scope + proof, M2 the gate (workflow + price range), M3 firm quote or scope nudge, M4+ pain + proof + paid first phase ----------
+const DECK_URL = "https://tinyurl.com/ZoTokContext";
+const CASES_URL = "https://www.zotok.ai/caseStudies";
+const MODULES = {
+  lead:{name:"Lead management", re:/lead|demand|campaign|marketing|enquir|activation|reach|new retailer|brand awareness|promotion/i,
+    line:"WhatsApp and Facebook campaigns bring in retailer and dealer enquiries; the chat qualifies each one and hands it to the right salesman or distributor.", journey:"lead_activation", journeyName:"Retailer activation and lead management", proof:"IndiaGate"},
+  ordering:{name:"Secondary ordering", re:/order|catalog|reorder|photo|voice|secondary|dealer|retailer|stock|price list|quote/i,
+    line:"retailers and dealers order from your catalogue on WhatsApp (text, photo or voice), and the order reaches the distributor and ERP without re-typing.", journey:"secondary_ordering", journeyName:"Retailer self-ordering and AI order capture", proof:"Haldiram's"},
+  collections:{name:"Collections", re:/payment|collection|outstanding|ledger|credit|reminder|due|invoice/i,
+    line:"ledger, invoices and outstanding go out on WhatsApp from your ERP, with scheduled payment reminders and a pay link.", journey:"collections", journeyName:"Automated collections and promise-to-pay", proof:"JK Cement"},
+  salesman:{name:"Salesman on WhatsApp", re:/salesman|salesmen|sales team|field|beat|visit|attendance|van|sales force|executive/i,
+    line:"your field team logs attendance, beats, orders and market feedback inside WhatsApp, with no app to install.", journey:"salesman_field", journeyName:"Field sales: attendance, van sales and market intel", proof:"Hindware"}
+};
+const PRICE = {
+  AC1:{setup:"₹25,000–40,000", integ:"₹10,000–25,000 for Tally integration", monthly:"₹10,000–15,000 a month", basis:"depending on users; typically 1–2 use cases"},
+  ICP:{setup:"₹40,000–75,000", integ:"₹25,000–50,000 for Tally/ERP integration", monthly:"₹20,000–40,000 a month", basis:"depending on users × use cases"},
+  AC2:{setup:"₹1–5 lakh", integ:"₹2–5 lakh for ERP integration", monthly:"₹75,000–3 lakh a month", basis:"depending on users × use cases"}
+};
+function tierOf(m){ return PRICE[m.tier] ? m.tier : "AC1"; }
+function scopeOf(m){
+  if (m.scopeKeys && m.scopeKeys.length) return m.scopeKeys;
+  const text = [...(m.rawPains||[]), ...(m.rawModules||[]), m.promised||"", m.notesText||""].join(" ");
+  const keys = Object.keys(MODULES).filter(k => MODULES[k].re.test(text));
+  const pick = keys.length ? keys : ["ordering","collections"];
+  return pick.slice(0, tierOf(m)==="AC1" ? 2 : 3);
+}
+function first(m){ return m.contact.startsWith("[") ? m.contact : (m.tier === "AC1" ? `${m.contact.split(" ")[0]} ji` : m.contact.split(" ")[0]); }
+function sign(m){ const r = REPS[m.rep] || {name:m.rep}; return `${r.name} | ZoTok`; }
+function caseFor(m,k){ const list = CASE_BY_INDUSTRY[m.industry] || ["Haldiram's","ITC Classmate","JK Cement"]; const n = list[k % list.length]; return {name:n, text:CASES[n]}; }
+function scopeCase(m){ const k = scopeOf(m)[0]; const n = MODULES[k].proof; return {name:n, text:CASES[n]}; }
+function priceBlock(m){ const p = PRICE[tierOf(m)]; return `Commercials, in short (similar companies have paid in this range):\n• One-time setup: ${p.setup}\n• Integration: ${p.integ}\n• Platform: ${p.monthly}, ${p.basis}\n• Meta ad spend and WhatsApp conversation charges are billed at actuals`; }
+function clientRepliedSince(m, i){
+  const outs = (m.emails||[]).filter(e => e.dir==="out" && e.step!==null && e.step < i);
+  const last = outs.pop(); if (!last) return null;
+  return (m.emails||[]).find(e => e.dir==="in" && (e.date > last.date || (e.date===last.date && e.time > last.time))) || null;
+}
+
+function buildDraft(m, i, ref){
+  const raw = !!ref; const [s1,s2] = raw ? slots(ref) : SLOTS; const f = first(m); const P1 = m.pains[0], P2 = m.pains[1];
+  const ac1 = tierOf(m) === "AC1";
+  const scope = scopeOf(m).map(k => MODULES[k]);
+  const att = [];
+  let subject, body, why;
+  if (!raw && m.reply && !m.replyHandled && m.stage==="S3"){
+    const lastOut = (m.emails||[]).filter(e => e.dir==="out").pop();
+    subject = lastOut ? (lastOut.subject.startsWith("Re:") ? lastOut.subject : `Re: ${lastOut.subject}`) : `Re: ${m.company} x ZoTok`;
+    body = `Hi ${f},\n\nThanks for getting back on this.\n\n[Answer their question directly, with the number or document they asked for.]\n\nCan we take the next step on ${s1} or ${s2}? 20 minutes is enough.\n\n${sign(m)}`;
+    why = "The client wrote last. Answer exactly what they asked, keep a slot in the close, and hold the scheduled cadence until this thread moves.";
+    return {subject, body, why, att, caseName:null};
+  }
+  switch(i){
+    case 0: {
+      const c = scopeCase(m);
+      subject = `${m.company}: ${scope.map(s => s.name.toLowerCase()).join(" + ")} on WhatsApp`;
+      body = `Hi ${f},\n\nThank you for the time. Here's what I understood:\n• ${cap(P1)}.\n• ${cap(P2)}.${m.numbers.startsWith("[") ? "" : `\n• Scale today: ${m.numbers}.`}\n\nWhat we would switch on for ${m.company}:\n${scope.map((s,k) => `${k+1}. ${s.name}: ${s.line}`).join("\n")}\n\n${c.text} Our overview deck, easy to forward internally: ${DECK_URL}\n\nIs this the right understanding? A yes or a correction is enough. I'll send the detailed workflow and the price range next.\n\n${sign(m)}`;
+      why = "M1: our understanding in their words, scope at module level, one matching case study and a forwardable deck. Close asks only to confirm the understanding.";
+      att.push({n:"ZoTok enterprise deck (link in body)", s:"Deck"});
+      return {subject, body, why, att, caseName:c.name};
+    }
+    case 1: {
+      const rep = clientRepliedSince(m, 1);
+      subject = `${m.company}: your WhatsApp workflow + price range`;
+      body = `Hi ${f},\n\n${rep ? "Thank you for your reply. I've built what you said into the workflow below." : "Following up on my last note. If anything in my understanding was off, just reply and I'll correct it."}\n\nAttached is the step-by-step journey for ${m.company}: ${scope.map(s => s.journeyName.toLowerCase()).join("; ")}. It shows exactly what your ${/dealer/i.test(P1+P2)?"dealers":"retailers"} and team will see on WhatsApp.\n\nPricing is based on active users and the number of use cases.\n\n${priceBlock(m)}\n\nCan we lock the scope on a 20-minute call, ${s1} or ${s2}? I'll send the firm quotation the same day.\n\n${sign(m)}`;
+      why = "M2 is the gate: confirm the understanding, attach the end-user journey, and put the price range in the body. Nothing moves to S4 without this email.";
+      scope.forEach(s => att.push({n:`${m.company} journey: ${s.journeyName} (use Download journey)`, s:"Journey"}));
+      break;
+    }
+    case 2:
+      if (m.scopeAgreed){
+        subject = `${m.company}: firm quotation and scope of work`;
+        body = `Hi ${f},\n\nAs agreed, attached are the firm quotation and scope of work. In short:\n• Scope: ${scope.map(s => s.name.toLowerCase()).join(", ")}\n• Setup: ₹[final] · Integration: ₹[final] · Platform: ₹[final] a month\n• Meta ad spend and WhatsApp conversation charges at actuals\n• Go-live in under 2 weeks; billed only after each phase is live and checked by your team\n\nTo start, we need the PO or setup advance. Shall we fix the kickoff for ${s1.split(",")[0]}?\n\n${sign(m)}`;
+        why = "M3 (scope agreed on a call or email): firm quote and SOW attached, the ask is the PO and a kickoff date.";
+        att.push({n:`${m.company} quotation + scope of work (PDF)`, s:"Proposals"});
+      } else {
+        subject = `${m.company}: one question before I send the proposal`;
+        body = `Hi ${f},\n\nI haven't heard back on the scope, so let me ask directly. Which of these is holding it?\n• Timing: every week this waits, ${P1}.\n• Price: we can start with ${scope[0].name.toLowerCase()} alone at the lower end of the range and add the rest once it pays back.\n• Proof: I can show you ${scopeCase(m).name}'s live flow in 15 minutes.\n\nA one-word reply (timing, price or proof) is enough, and I'll shape the detailed proposal around it.\n\n${sign(m)}`;
+        why = "M3 (no confirmation yet): silence is timing, price or proof. Name all three, tie timing back to their own pain, ask for one word.";
+      }
+      break;
+    case 3: {
+      const c = caseFor(m, 0);
+      subject = `${m.company}: start small, one ${ac1 ? "area" : "region"}, 30 days`;
+      body = `Hi ${f},\n\nEvery week without a fix, ${P1}. That cost doesn't pause while the decision waits.\n\n${c.text}\n\nIf a full rollout feels like a big step, let's start small and paid: ${scope[0].name.toLowerCase()} only, one ${ac1 ? "area" : "region"}, 30 days, at the setup fee plus one month. You then decide the next phase with real numbers in hand.\n\nShall I block ${s1} to plan it?\n\n${sign(m)}`;
+      why = "M4: anchor to their pain, name the cost of delay, one case study, and offer a paid first phase.";
+      return {subject, body, why, att, caseName:c.name};
+    }
+    case 4: case 5: case 6: case 8: {
+      const c = caseFor(m, i-3);
+      subject = `${m.company}: how ${c.name} fixed ${shortPain(P1)}`;
+      body = `Hi ${f},\n\nYou mentioned ${P1}. ${c.name} had the same problem.\n\n${c.text}\n\n${i===8 ? "You don't need to staff this: a ZoTok team runs it end to end and reports to you weekly.\n\n" : ""}The paid first phase is still open: ${scope[0].name.toLowerCase()} only, 30 days. Worth 20 minutes on ${s1} or ${s2}?\n\n${sign(m)}`;
+      why = "M5+: keep anchoring to their pain with one new case study each time, and keep the paid first phase on the table.";
+      att.push({n:`${c.name} case study`, s:CASES_URL});
+      return {subject, body, why, att, caseName:c.name};
+    }
+    case 7:
+      subject = `${m.company}: live before the Diwali rush`;
+      body = `Hi ${f},\n\nDiwali stocking decisions are being made now. Going live by ${fmtShort(addDays(ref||T0,10))} means your ${/dealer/i.test(P1+P2)?"dealers":"retailers"} order on WhatsApp through the whole season, including the late-night orders nobody picks up today.\n\nBrands on ZoTok typically see a 5–15% lift in reach within 90 days.\n\nThe paid first phase can start this week. ${s1} or ${s2} to kick off?\n\n${sign(m)}`;
+      why = "A real deadline (the festive season) plus a reach number. Use only while the season is ahead.";
+      break;
+    case 9:
+      subject = `${m.company}: closing the file for now`;
+      body = `Hi ${f},\n\nI haven't heard back, so I'm assuming the timing isn't right and I'm closing this file on my end.\n\nIf ${P1} starts to hurt again, reply to this mail and we'll pick up where we left off. Your workflow and price range stay on file.\n\n${sign(m)}`;
+      why = "Respectful close. After this the account moves to the remarketing list.";
+      break;
+  }
+  return {subject, body, why, att, caseName:null};
+}
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+function shortPain(p){ return p.split(/,| and | because /)[0].replace(/^(orders|dealers|retailers|prices?)\s/i, (x)=>x.toLowerCase()); }
+
+// ---------- quality checks (from the Email SOP rules) ----------
+function checks(m, i, subject, body, SL = SLOTS){
+  const words = body.replace(/Commercials, in short:[\s\S]*?(?=\n\n)/, "").trim().split(/\s+/).filter(Boolean).length;
+  const limit = WORD_LIMIT[m.tier];
+  const opening = (body.split("\n").find((l,idx) => idx>0 && l.trim()) || "").trim();
+  const slotHits = SL.filter(s => body.includes(s)).length;
+  const closeOk = slotHits >= 2 || /\?\s*(Yes or no|yes or no)/.test(body) || /Yes or no is enough/.test(body);
+  const isClose = i === 9 && !(m.reply && !m.replyHandled);
+  return [
+    {t:`Subject names ${m.company}`, s: subject.toLowerCase().includes(m.company.toLowerCase()) ? "pass":"fail"},
+    {t:"Opens about them", s: /^(we|our|zotok|i am|i'm)\b/i.test(opening) ? "fail":"pass"},
+    {t:`${words}/${limit} words`, s: words <= limit ? "pass":"fail"},
+    {t:"No [brackets] left", s: /\[[^\]]+\]/.test(subject+body) ? "fail":"pass"},
+    {t:"Price in body", s: (i===1 || (i===2 && m.scopeAgreed)) ? (/₹/.test(body) ? "pass":"fail") : "na"},
+    {t:"Two slots or yes/no", s: isClose ? "na" : (closeOk ? "pass":"fail")},
+    {t:"One case study max", s: Object.keys(CASES).filter(k => body.includes(k+" ") || body.includes(k+"'")).length <= (i===3?3:1) ? "pass":"fail"}
+  ];
+}
+
+// ---------- render ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function tierChip(t){ return `<span class="chip t-${t}">${t}</span>`; }
+function dots(m){ return `<span class="dots" aria-label="Cadence">${OFFSETS.map((_,i)=>`<span class="dot ${stepStatus(m,i)}" title="M${i+1}: ${stepStatus(m,i)}"></span>`).join("")}</span>`; }
+function txIcon(m){ return m.tx === "missing" ? `<span class="chip s-late">No transcript</span>` : m.tx === "uploaded" ? `<span class="chip s-due">Transcript syncing</span>` : ""; }
+
+function renderHeader(){
+  $("#today").textContent = T0.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const counts = r => MEETINGS.filter(m => r==="All" || m.rep===r).length;
+  $("#repSel").innerHTML = ["All", ...Object.keys(REPS).sort()].map(r => `<option value="${r}" ${state.rep===r?"selected":""}>${r==="All"?"All salespeople":r} (${counts(r)})</option>`).join("");
+}
+function renderKpis(){
+  const ms = mine();
+  const b = ms.map(bucket);
+  const due = b.filter(x=>x==="due").length, late = b.filter(x=>x==="late").length, rep = b.filter(x=>x==="reply").length;
+  const tx = ms.filter(m=>m.tx==="missing").length;
+  // on-time over last 7 days: steps due in last 7 days that are sent vs all due
+  let dueN=0, onN=0;
+  ms.forEach(m => OFFSETS.forEach((o,i) => { const d = addDays(m.date,o); if (d < T0 && d >= addDays(T0,-7) && m.stage==="S3") { dueN++; if (i < sentCount(m)) onN++; } }));
+  const pct = dueN ? Math.round(onN/dueN*100) : 100;
+  $("#kpis").innerHTML = `
+    <div class="kpi due"><b>${due}</b><span>emails due today</span></div>
+    <div class="kpi late"><b>${late}</b><span>overdue</span></div>
+    <div class="kpi pause"><b>${rep}</b><span>client replies to answer</span></div>
+    <div class="kpi"><b>${tx}</b><span>transcripts missing</span></div>
+    <div class="kpi"><b>${pct}%</b><span>SLA met, last 7 days</span></div>`;
+  $("#c-today").textContent = due + late + rep;
+  $("#c-meet").textContent = ms.length;
+}
+
+function row(m){
+  const s = currentStep(m); const bk = bucket(m);
+  const stepTxt = bk==="reply" ? "Reply" : bk==="moved" ? m.stage : s===null ? "Done" : `M${s+1}`;
+  const cls = bk==="late"?"s-late":bk==="due"?"s-due":bk==="reply"?"s-pause":bk==="moved"?"s-ok":"s-mute";
+  return `<button type="button" class="row" data-id="${m.id}" aria-current="${state.sel===m.id}">
+    <span class="co">${esc(m.company)}</span>
+    <span class="step chip ${cls}">${stepTxt}</span>
+    <span class="meta">${tierChip(m.tier)}<span>T+${m.daysAgo}</span><span>${m.rep}</span>${dots(m)}${txIcon(m)}${detected(m).some(e=>e.daysAgo===0) ? `<span class="chip s-ok">Sent today · grow@</span>` : ""}</span>
+  </button>`;
+}
+function group(title, color, items, emptyMsg){
+  return `<div class="group"><h3><span class="pip" style="background:${color}"></span><span class="label">${title}</span><span class="mono" style="font-size:12px;color:var(--muted)">${items.length}</span></h3>
+  ${items.length ? `<div class="rows">${items.map(row).join("")}</div>` : `<div class="empty">${emptyMsg}</div>`}</div>`;
+}
+
+function renderList(){
+  const ms = mine();
+  if (state.tab === "today"){
+    const by = k => ms.filter(m => bucket(m)===k).sort((a,b)=>b.daysAgo-a.daysAgo);
+    return group("Overdue","var(--late)",by("late"),"Nothing overdue.") +
+           group("Client replied · cadence paused","var(--pause)",by("reply"),"No replies waiting.") +
+           group("Due today","var(--due)",by("due"),"Nothing else due today.") +
+           group("Sent today · picked up from grow@","var(--ok)",ms.filter(m=>detected(m).some(e=>e.daysAgo===0)),"Nothing picked up from grow@ yet today.");
+  }
+  // meetings by date
+  const filt = ms.filter(m => state.filter==="all" || (state.filter==="tx" && m.tx==="missing") || m.tier===state.filter);
+  const days = [...new Set(filt.map(m=>m.daysAgo))].sort((a,b)=>a-b);
+  const f = ["all","AC1","ICP","AC2","tx"].map(k=>`<button type="button" data-filter="${k}" aria-pressed="${state.filter===k}">${k==="all"?"All":k==="tx"?"No transcript":k}</button>`).join("");
+  return `<div class="filters" role="group" aria-label="Filter">${f}</div>` + (days.length ? days.map(d => {
+    const items = filt.filter(m=>m.daysAgo===d);
+    return `<div class="group"><div class="dayhead"><span class="d">${fmt(addDays(T0,-d))}</span><span class="label">${d===0?"today":`T+${d}`} · ${items.length} meeting${items.length>1?"s":""}</span></div><div class="rows">${items.map(row).join("")}</div></div>`;
+  }).join("") : `<div class="empty">No meetings match this filter.</div>`);
+}
+
+function renderDetail(){
+  const m = MEETINGS.find(x=>x.id===state.sel);
+  if (!m) return `<section class="detail"><div class="composer"><p class="label">No meeting selected</p><p style="margin:0;color:var(--muted)">Pick a meeting on the left to see its draft.</p></div></section>`;
+  const cur = currentStep(m);
+  const replyMode = m.reply && !m.replyHandled && m.stage==="S3";
+  if (state.step === null || state.step === undefined) state.step = cur ?? 9;
+  const i = state.step;
+  const key = `${m.id}:${replyMode?"r":i}`;
+  const d = buildDraft(m, i);
+  const draft = state.drafts[key] || GEN[key] || {subject:d.subject, body:d.body};
+  const gen = GEN[key];
+  const st = replyMode ? "paused" : stepStatus(m,i);
+  const dueDate = addDays(m.date, OFFSETS[i]);
+  const stLabel = replyMode ? "Reply now" : {sent:"Sent",due:"Due today",overdue:`Overdue since ${fmtShort(dueDate)}`,upcoming:`Scheduled ${fmt(dueDate)}`,paused:"Paused"}[st];
+  const stCls = replyMode ? "s-pause" : {sent:"s-ok",due:"s-due",overdue:"s-late",upcoming:"s-mute",paused:"s-pause"}[st];
+  const canSend = replyMode || st==="due" || st==="overdue";
+
+  return `<section class="detail" aria-label="${esc(m.company)}">
+    <div class="dhead">
+      <div>
+        <h2>${esc(m.company)}</h2>
+        <div class="who">${esc(m.contact)} · ${esc(m.role)} · <span class="mono">${esc(m.email)}</span></div>
+        <div class="facts">${tierChip(m.tier)}<span class="chip s-mute">${m.industry}</span>${m.erp==="your ERP" ? "" : `<span class="chip s-mute">${esc(m.erp)}</span>`}<span class="chip ${m.stage==="S3"?"s-mute":"s-ok"}">${m.stage}</span></div>
+      </div>
+      <div class="right"><div class="label">Demo</div><div class="mono">${fmt(m.date)} · T+${m.daysAgo}</div><div style="font-size:12px;color:var(--muted)">Owner: ${m.rep}</div></div>
+    </div>
+    ${replyMode ? `<div class="banner pause"><div><strong>${esc(m.contact)} replied on ${fmt(m.reply.date)}. Scheduled emails are on hold.</strong><q>“${esc(m.reply.text)}”</q></div></div>` : ""}
+    ${m.stage!=="S3" ? `<div class="banner pause"><div><strong>Moved to ${m.stage}. The cadence has stopped.</strong><q>“${esc(m.reply?.text||"")}”</q></div></div>` : ""}
+    ${detected(m).filter(e=>e.daysAgo<=2).map(e=>{ const k = m.sent + detected(m).indexOf(e); const when = `${fmt(addDays(T0,-e.daysAgo))}, ${e.time}`;
+       return `<div class="banner ok"><div><strong>M${k+1} picked up from grow@ (${when})${e.own ? ", written outside the desk" : ", not marked sent here"}. The cadence moved on to M${Math.min(k+2,10)}.</strong>Subject: “${esc(e.subject)}”${e.own && k>=1 && k<=3 && !e.price ? " · It had no price in the body, so the next email carries the commercials." : ""}</div></div>`; }).join("")}
+    ${m.tx==="missing" ? `<div class="banner warn"><div><strong>No transcript yet. This draft uses the CSV fields only.</strong>Upload the transcript on the right to get a draft in the client's own words.</div></div>` : ""}
+    <div class="dbody">
+      <div class="composer">
+        <div class="stepbar" role="group" aria-label="Email in cadence">
+          ${OFFSETS.map((o,k)=>`<button type="button" class="${stepStatus(m,k)}" data-step="${k}" aria-pressed="${!replyMode && k===i}" title="${STEP_NAMES[k]} · T+${o}">M${k+1}</button>`).join("")}
+        </div>
+        <div class="panes" role="tablist" aria-label="View">
+          <button type="button" role="tab" data-pane="draft" aria-selected="${state.pane==="draft"}">${replyMode ? "Reply draft" : `Draft · M${i+1}`}</button>
+          <button type="button" role="tab" data-pane="thread" aria-selected="${state.pane==="thread"}">Email thread (${thread(m).length})</button>
+        </div>
+        ${state.pane==="thread" ? renderThread(m) : `
+        <div class="stephead">
+          <h3>${replyMode ? "Reply to client" : `M${i+1} · ${STEP_NAMES[i]}`}</h3>
+          <span class="chip ${stCls}">${stLabel}</span>
+          ${replyMode ? "" : `<span class="mono" style="font-size:12px;color:var(--muted)">T+${OFFSETS[i]}</span>`}
+          <span class="why">${esc(d.why)}</span>
+        </div>
+        <div class="genbar">
+          <button class="btn gen" type="button" id="genEmail" ${AI ? "" : "disabled title=\"Sign in with your ZoTok account to use this\""}>✦ Write with Claude</button>
+          <button class="btn" type="button" id="openJourney">Download journey</button>
+          ${!replyMode && i===2 ? `<label class="toggle"><input type="checkbox" id="scopeAgreed" ${m.scopeAgreed?"checked":""}> Scope agreed on a call or email</label>` : ""}
+          <span class="note" id="genStatus">${gen ? `Written by Claude ${gen.at ? fmtShort(new Date(gen.at)) : ""} from the notes, transcript and thread.` : "Base draft. Claude rewrites it using the notes, transcript and thread."}</span>
+        </div>
+        <div class="journeybox" id="journeyBox" hidden>
+          <div class="label">Brand a standard journey for ${esc(m.company)}</div>
+          <div class="jgrid">
+            <label for="jBrand">Brand name<input id="jBrand" value="${esc(m.company)}"></label>
+            <label for="jInit">Initials<input id="jInit" maxlength="3" value="${esc(initials(m.company))}"></label>
+            <label for="jInd">Industry line<input id="jInd" value="${esc(m.industry)}"></label>
+          </div>
+          <div class="jmods">${Object.keys(MODULES).map(k => `<label><input type="checkbox" data-jmod="${k}" ${scopeOf(m).includes(k)?"checked":""}> ${MODULES[k].journeyName}</label>`).join("")}</div>
+          <div class="actions"><button class="btn primary" type="button" id="dlJourney">Download selected</button><span class="note">Standard SKUs are kept. Edit offline if needed.</span></div>
+        </div>
+        <div class="field"><span class="k">To</span><span class="v" id="to">${esc(m.email)}</span><button class="mini" type="button" data-copy="to">Copy</button></div>
+        <div class="field"><span class="k">CC</span><span class="v">grow@zotok.ai</span><span class="chip s-mute">required</span></div>
+        <div class="field"><label class="k" for="subject">Subject</label><input id="subject" value="${esc(draft.subject)}" autocomplete="off"><button class="mini" type="button" data-copy="subject">Copy</button></div>
+        <textarea id="body" spellcheck="true" aria-label="Email body">${esc(draft.body)}</textarea>
+        <div class="checks" id="checks" aria-label="Email checks"></div>
+        ${d.att.length ? `<div class="attach"><span class="label">Attach in your mail client</span>${d.att.map((a,k)=>`<label><input type="checkbox" id="att-${k}"> ${esc(a.n)} <span class="src">${esc(a.s)}</span></label>`).join("")}</div>` : ""}
+        <div class="actions">
+          <button class="btn" type="button" data-copy="body">Copy body</button>
+          <button class="btn" type="button" data-copy="all">Copy subject + body</button>
+          <button class="btn" type="button" id="reset">Reset draft</button>
+          <button class="btn primary" type="button" id="markSent" ${canSend?"":"disabled"}>${replyMode ? "Mark reply sent" : `Mark M${i+1} sent`}</button>
+          <span class="note">grow@ marks emails sent automatically, even ones written outside the desk. Use this only if the CC was missed.</span>
+        </div>`}
+      </div>
+      <aside class="side">
+        <div>
+          <h4 class="label">Transcript</h4>
+          ${m.tx==="available" ? `<div class="tx"><span class="mono" style="font-size:12px">${esc(m.txInfo.name)}</span><a href="${esc(m.txInfo.webUrl)}" target="_blank" rel="noopener">Open in SharePoint ↗</a><span style="font-size:12px;color:var(--muted)">Recorded ${m.txInfo.date ? fmt(pISO(m.txInfo.date)) : ""}. Pains and numbers below come from here.</span></div>`
+            : m.tx==="uploaded" ? `<div class="tx"><span class="mono" style="font-size:12px">${esc(m.txName||"transcript")}</span><span style="font-size:12px;color:var(--muted)">Uploaded here. "Write with Claude" reads it now; the daily sync copies it to SharePoint.</span></div>`
+            : `<div class="drop" id="drop"><div>Drop the transcript here or <label for="txfile">choose a file</label></div><div style="font-size:12px;margin-top:4px">.docx, .txt or .vtt · Claude uses it for drafts; the daily sync files it in SharePoint › Transcripts</div><input type="file" id="txfile" accept=".docx,.txt,.vtt"></div>`}
+        </div>
+        <div>
+          <h4 class="label">What we heard</h4>
+          ${!m.tx || m.tx!=="available" ? `<p style="margin:0 0 8px;font-size:12px;color:var(--muted)">No transcript, so this comes from the recap emails where they said enough.</p>` : ""}
+          <ul class="heard">
+            ${[["Pain 1", m.rawPains[0]], ["Pain 2", m.rawPains[1]], ["Scale", m.numbers.startsWith("[") ? "" : m.numbers], ["ERP", m.erp === "your ERP" ? "" : m.erp], ["Switch on", m.rawModules.join(" + ")], ["Decides", m.dm], ["We owe", m.promised === "next steps" ? "" : m.promised]]
+              .map(([k,v]) => `<li><span class="k">${k}</span><span${v ? "" : ' style="color:var(--faint)"'}>${v ? esc(cap(v)) : "Not captured"}</span></li>`).join("")}
+          </ul>
+        </div>
+        <div>
+          <h4 class="label">Cadence</h4>
+          <ol class="tl">${OFFSETS.map((o,k)=>{const s=stepStatus(m,k);const c={sent:"s-ok",due:"s-due",overdue:"s-late",upcoming:"s-mute",paused:"s-pause"}[s];return `<li><span class="m">M${k+1}</span><span class="dt">${fmtShort(sentDate(m,k) || addDays(m.date,o))}</span><span>${STEP_NAMES[k]}${(()=>{const src = s==="sent" ? sentSource(m,k) : null; return src ? `<br><span style="font-size:11px;color:var(--muted)">via grow@${src.own?" · own words":""}</span>` : ""})()}</span><span class="chip ${c}">${s}</span></li>`}).join("")}</ol>
+        </div>
+        <div>
+          <h4 class="label">Notes and context</h4>
+          <div class="noteform">
+            <select id="noteKind" aria-label="Note type"><option>Phone call</option><option>Internal discussion</option><option>Client WhatsApp</option><option>Other</option></select>
+            <textarea id="noteText" rows="3" placeholder="What changed since the demo? Objections, who decides, dates, numbers…"></textarea>
+            <button class="btn" type="button" id="saveNote" ${DB ? "" : "disabled"}>Save note</button>
+          </div>
+          <ul class="notes">${m.notesList.length ? m.notesList.map(n => `<li><span class="chip s-mute">${esc(n.kind||"Note")}</span> <span class="mono" style="font-size:11px;color:var(--muted)">${n.at ? fmtShort(new Date(n.at)) : ""} · ${esc(nameOf(n.by))}</span><div>${esc(n.text)}</div></li>`).join("") : `<li class="empty-note">No notes yet. Anything saved here feeds "Write with Claude".</li>`}</ul>
+        </div>
+        ${m.meetings.length > 1 ? `<p style="margin:0;font-size:12.5px"><span class="label">Meetings</span><br>${m.meetings.map(d => fmt(pISO(d))).join(" · ")}</p>` : ""}
+        ${m.notes ? `<p style="margin:0;font-size:12.5px;color:var(--muted)"><span class="label">Data notes</span><br>${esc(m.notes)}</p>` : ""}
+        <p class="tip">What got replies in the grow@ inbox: their own numbers written back, the price in the body, and two specific slots.</p>
+      </aside>
+    </div>
+  </section>`;
+}
+
+function thread(m){
+  const items = (m.emails||[]).map(e => {
+    const date = pISO(e.date);
+    return {dir:e.dir, step:e.step, date, time:e.time, subject:e.subject, body:e.body, own:false, from:{name:e.from, email:e.fromEmail}, to:e.to, link:e.link, sl:slots(date)};
+  });
+  (m.extra||[]).forEach(x => items.push(x));
+  return items.sort((a,b) => (a.date - b.date) || a.time.localeCompare(b.time));
+}
+function renderThread(m){
+  const items = thread(m);
+  const targetIdx = state.openStep !== null ? items.findIndex(x => x.step === state.openStep && x.dir==="out") : items.length - 1;
+  const cur = currentStep(m);
+  const next = (cur !== null && m.stage === "S3")
+    ? `<div class="next"><span>${m.reply && !m.replyHandled ? `<b>Next:</b> reply to ${esc(m.contact)}. Scheduled emails are on hold.` : `<b>Next:</b> M${cur+1} · ${STEP_NAMES[cur]} · ${stepStatus(m,cur)==="upcoming" ? fmt(addDays(m.date,OFFSETS[cur])) : stepStatus(m,cur)==="due" ? "due today" : stepStatus(m,cur)}`}</span><button class="btn" type="button" data-pane="draft">Open draft</button></div>`
+    : `<div class="next"><span>${m.stage!=="S3" ? `Moved to ${m.stage}. No more cadence emails.` : "All 10 emails sent. This account moves to remarketing."}</span></div>`;
+  if (!items.length) return `<div class="threadbar"><span>Copied from grow@zotok.ai · no emails yet</span></div><div class="empty">Nothing has gone to ${esc(m.contact)} yet. The first email shows up here as soon as grow@ receives the CC.</div>${next}`;
+  return `<div class="threadbar"><span>Copied from grow@zotok.ai · ${items.length} email${items.length>1?"s":""} · ${items.filter(x=>x.dir==="in").length} from the client</span><button class="mini" type="button" data-expand="1">Expand all</button></div>
+  <div class="thread">${items.map((x,k) => {
+    const out = x.dir === "out";
+    const fromName = out ? (x.from.name || m.rep) : (x.from.name || m.contact);
+    const tag = !out ? `<span class="chip s-pause">Client reply</span>` : x.reply ? `<span class="chip s-ok">Reply</span>` : `<span class="chip ${x.own ? "s-due" : "s-ok"}">M${x.step+1}${x.own ? " · own words" : ""}</span>`;
+    const c = out && !x.reply ? checks(m, x.step, x.subject, x.body, x.sl || SLOTS).filter(c => c.s !== "na") : [];
+    const fails = c.filter(c => c.s === "fail");
+    const snippet = x.body.split("\n").filter(l => l.trim())[out ? 1 : 0] || "";
+    return `<details class="mail ${out?"out":"in"} ${k===targetIdx && state.openStep!==null ? "target" : ""}" id="mail-${k}" ${k===targetIdx ? "open" : ""}>
+      <summary><span class="from">${esc(fromName)}</span><span class="subj">${esc(x.subject)}</span><span class="when">${fmtShort(x.date)}, ${x.time}</span>
+        <span class="snip">${tag}${c.length ? `<span class="chip ${fails.length ? "s-late" : "s-ok"}">${c.length-fails.length}/${c.length} checks</span>` : ""}<span class="txt">${esc(snippet)}</span></span></summary>
+      <div class="mhead"><span>From: ${esc(fromName)} &lt;${esc(x.from.email || (out ? "" : m.email))}&gt;</span><span>To: ${esc(x.to || (out ? m.email : (REPS[m.rep]||{}).email || ""))}</span><span>Cc: grow@zotok.ai</span><span>Date: ${fmt(x.date)} ${x.date.getFullYear()}, ${x.time} IST</span>${x.link ? `<a href="${esc(x.link)}" target="_blank" rel="noopener" style="color:var(--accent);font-family:var(--f-body)">Open in Outlook ↗</a>` : ""}</div>
+      <div class="mbody">${esc(x.body)}</div>
+      ${fails.length ? `<div class="checks">${fails.map(f => `<span class="check fail">${esc(f.t)}</span>`).join("")}</div>` : ""}
+    </details>`; }).join("")}</div>${next}`;
+}
+
+function renderPulse(){
+  const reps = Object.keys(REPS);
+  const rowsRep = reps.map(r => {
+    const ms = MEETINGS.filter(m=>m.rep===r);
+    let dueN=0,onN=0; ms.forEach(m=>OFFSETS.forEach((o,i)=>{const d=addDays(m.date,o); if(d<T0 && m.stage==="S3"){dueN++; if(i<sentCount(m)) onN++;}}));
+    const late = ms.filter(m=>bucket(m)==="late").length;
+    const s4 = ms.filter(m=>m.stage==="S4"||m.stage==="S5").length;
+    const tx = ms.filter(m=>m.tx==="missing").length;
+    const pct = dueN?Math.round(onN/dueN*100):100;
+    return `<tr><td>${r}</td><td class="n">${ms.length}</td><td class="n">${onN}/${dueN}</td><td class="n">${pct}%<span class="bar" style="width:${pct*0.6}px"></span></td><td class="n">${late}</td><td class="n">${ms.filter(m=>(m.emails||[]).some(e=>e.dir==="in")).length}</td><td class="n">${tx}</td><td class="n">${s4} (${Math.round(s4/ms.length*100)}%)</td></tr>`;
+  }).join("");
+  const rowsTier = ["AC1","ICP","AC2"].map(t => {
+    const ms = MEETINGS.filter(m=>m.tier===t); const s4 = ms.filter(m=>m.stage==="S4"||m.stage==="S5").length; const rep = ms.filter(m=>(m.emails||[]).some(e=>e.dir==="in")).length;
+    return `<tr><td>${tierChip(t)}</td><td class="n">${ms.length}</td><td class="n">${rep}</td><td class="n">${s4}</td><td class="n">${ms.length?Math.round(s4/ms.length*100):0}%</td></tr>`;
+  }).join("");
+  return `<div class="pulse">
+    <p>September S3 meetings from the demo tracker, scored against the M1–M10 schedule using every client email seen in grow@zotok.ai (one step per day). Stage S4/S5 is read from the email threads, so check it against the master tracker.</p>
+    <div><h3 class="label" style="margin:0 0 8px">Email SLA by salesperson · last 30 days</h3>
+    <div class="tablewrap"><table><thead><tr><th>Salesperson</th><th class="n">S3 meetings</th><th class="n">Emails sent / due</th><th class="n">Sent / due</th><th class="n">Overdue now</th><th class="n">Client replied</th><th class="n">No transcript</th><th class="n">Moved to S4+</th></tr></thead><tbody>${rowsRep}</tbody></table></div></div>
+    <div><h3 class="label" style="margin:0 0 8px">S3 → S4 by account tier</h3>
+    <div class="tablewrap"><table><thead><tr><th>Tier</th><th class="n">S3 meetings</th><th class="n">Client replied</th><th class="n">Moved to S4/S5</th><th class="n">S3 → S4+</th></tr></thead><tbody>${rowsTier}</tbody></table></div></div>
+  </div>`;
+}
+
+function render(){
+  renderHeader(); renderKpis();
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab===state.tab));
+  if (state.tab === "pulse"){ $("#main").innerHTML = renderPulse(); return; }
+  if (!MEETINGS.length){ $("#main").innerHTML = `<div class="boot">${BOOT_MSG}</div>`; return; }
+  const ms = mine();
+  if (!state.sel || !ms.some(m=>m.id===state.sel)){
+    const pick = ms.find(m=>bucket(m)==="late") || ms.find(m=>bucket(m)==="reply") || ms.find(m=>bucket(m)==="due") || ms[0];
+    state.sel = pick?.id || null; state.step = null;
+  }
+  $("#main").innerHTML = `<div class="work"><div class="list">${renderList()}</div>${renderDetail()}</div>`;
+  wireDetail();
+}
+
+function currentMeeting(){ return MEETINGS.find(x=>x.id===state.sel); }
+function draftKey(){ const m = currentMeeting(); const rm = m.reply && !m.replyHandled && m.stage==="S3"; return `${m.id}:${rm?"r":state.step}`; }
+function runChecks(){
+  const m = currentMeeting(); if (!m) return;
+  const el = $("#checks"); if (!el) return;
+  const c = checks(m, state.step, $("#subject").value, $("#body").value);
+  el.innerHTML = c.map(x=>`<span class="check ${x.s}">${esc(x.t)}</span>`).join("");
+}
+function wireDetail(){
+  const sub = $("#subject"), body = $("#body");
+  if (!sub) return;
+  const save = () => { state.drafts[draftKey()] = {subject:sub.value, body:body.value}; runChecks(); };
+  sub.addEventListener("input", save); body.addEventListener("input", save);
+  runChecks();
+  const drop = $("#drop"), file = $("#txfile");
+  if (drop){
+    ["dragenter","dragover"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add("over")}));
+    ["dragleave","drop"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove("over")}));
+    drop.addEventListener("drop", ev => { const f = ev.dataTransfer.files[0]; if (f) takeFile(f); });
+    file.addEventListener("change", () => { if (file.files[0]) takeFile(file.files[0]); });
+  }
+}
+async function takeFile(f){
+  const m = currentMeeting(); if (!DB){ toast("Sign in with your ZoTok account to upload transcripts."); return; }
+  try{
+    toast(`Reading ${f.name}…`);
+    let text = "";
+    if (/\.docx$/i.test(f.name)){
+      if (!window.JSZip) throw new Error("docx reader not loaded");
+      const zip = await JSZip.loadAsync(f); const xml = await zip.file("word/document.xml").async("string");
+      text = xml.replace(/<\/w:p>/g,"\n").replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+    } else text = await f.text();
+    text = text.replace(/\n{3,}/g,"\n\n").slice(0, 200000);
+    const name = `${m.company.replace(/[^A-Za-z0-9]+/g,"")}_S3_${iso(m.date)}.${(f.name.split(".").pop()||"txt").toLowerCase()}`;
+    const at = new Date().toISOString();
+    await DB.doc("transcripts/"+m.id).set({meetingId:m.id, name, original:f.name, text, at, by:ME||"", sharepointSynced:false});
+    await DB.doc("txmeta/"+m.id).set({meetingId:m.id, name, at, chars:text.length});
+    toast("Transcript saved. Write with Claude will use it.");
+  }catch(e){ toast("Couldn't read that file. Try .txt, .vtt or .docx."); }
+}
+function initials(n){ return (n.replace(/\b(pvt|private|ltd|limited|llp|india|the)\b/ig,"").trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("") || n.slice(0,2)).toUpperCase(); }
+function nameOf(id){ return (id && NAMES[id]) || "Someone"; }
+
+async function copy(text, label){
+  try { await navigator.clipboard.writeText(text); toast(`${label} copied`); }
+  catch(e){
+    const ta = document.createElement("textarea"); ta.value = text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok = document.execCommand("copy"); }catch(_){}
+    ta.remove(); toast(ok ? `${label} copied` : "Copy blocked here. Select the text and press Ctrl+C.");
+  }
+}
+let tt; function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,2600); }
+
+document.addEventListener("change", e => {
+  if (e.target.id === "scopeAgreed"){ const m=currentMeeting(); const v=e.target.checked; FLAGS[m.id]={...(FLAGS[m.id]||{}), scopeAgreed:v}; rebuild(); render(); if (DB) DB.doc("flags/"+m.id).set({meetingId:m.id, scopeAgreed:v, by:ME||"", at:new Date().toISOString()}).catch(()=>toast("Couldn't save that. You may have view-only access.")); return; }
+  if (e.target.id === "repSel"){ state.rep = e.target.value; state.sel = null; try{localStorage.setItem("s3desk.rep",state.rep)}catch(_){} render(); } });
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.rep){ state.rep = t.dataset.rep; state.sel = null; try{localStorage.setItem("s3desk.rep",state.rep)}catch(_){} render(); return; }
+  if (t.dataset.tab){ state.tab = t.dataset.tab; render(); return; }
+  if (t.dataset.filter){ state.filter = t.dataset.filter; render(); return; }
+  if (t.dataset.id){ state.sel = t.dataset.id; state.step = null; state.openStep = null; render(); if (window.innerWidth < 980) document.querySelector(".detail")?.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if (t.dataset.step){ const m = currentMeeting(); const k = +t.dataset.step;
+    if (stepStatus(m,k) === "sent"){ state.pane = "thread"; state.openStep = k; render(); document.querySelector(".mail.target")?.scrollIntoView({behavior:"smooth",block:"nearest"}); return; }
+    if (m.reply && !m.replyHandled && m.stage==="S3"){ toast("Scheduled emails are on hold until this reply is handled."); return; }
+    state.pane = "draft"; state.step = k; render(); return; }
+  if (t.dataset.pane){ state.pane = t.dataset.pane; state.openStep = null; render(); return; }
+  if (t.dataset.expand){ const all = [...document.querySelectorAll(".mail")]; const open = all.some(d => !d.open); all.forEach(d => d.open = open); t.textContent = open ? "Collapse all" : "Expand all"; return; }
+  if (t.dataset.copy){
+    const m = currentMeeting();
+    if (t.dataset.copy==="to") copy(m.email,"Address");
+    if (t.dataset.copy==="subject") copy($("#subject").value,"Subject");
+    if (t.dataset.copy==="body") copy($("#body").value,"Body");
+    if (t.dataset.copy==="all") copy(`Subject: ${$("#subject").value}\n\n${$("#body").value}`,"Subject and body");
+    return;
+  }
+  if (t.id==="genEmail"){ generateEmail(); return; }
+  if (t.id==="openJourney"){ const b=$("#journeyBox"); b.hidden=!b.hidden; return; }
+  if (t.id==="dlJourney"){ downloadJourneys(); return; }
+  if (t.id==="saveNote"){ saveNote(); return; }
+  if (t.id==="reset"){ const k=draftKey(); delete state.drafts[k]; if (GEN[k] && DB){ DB.doc("drafts/"+k.replace(":","_")).delete().catch(()=>{}); }  delete state.drafts[draftKey()]; render(); toast("Draft reset"); return; }
+  if (t.id==="markSent"){
+    const m = currentMeeting();
+    const now = new Date(); const hhmm = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+    const isReply = m.reply && !m.replyHandled && m.stage==="S3";
+    (m.extra = m.extra || []).push({dir:"out", step: isReply ? null : state.step, reply: isReply, date:T0, time:hhmm, subject:$("#subject").value, body:$("#body").value, own:false, from:REPS[m.rep]});
+    if (isReply){ m.replyHandled = true; toast("Reply logged. Cadence resumes from the next scheduled email."); }
+    else { state.sentOverride[m.id] = Math.max(sentCount(m), state.step+1); toast(`M${state.step+1} marked sent for ${m.company}`); }
+    state.step = null; render(); return;
+  }
+});
+
+// ---------- live data, notes, Claude drafting, journey download ----------
+let DB = null, AI = null, DL = null, USER = null, ME = null;
+const NAMES = {};
+let BOOT_MSG = "Loading the desk…";
+let pending = false;
+function editing(){ const a = document.activeElement; return !!(a && a.closest && a.closest(".detail") && /TEXTAREA|INPUT|SELECT/.test(a.tagName)); }
+function safeRender(){ if (state.busy || editing()){ pending = true; return; } render(); }
+document.addEventListener("focusout", () => { if (pending) setTimeout(() => { if (!state.busy && !editing()){ pending = false; render(); } }, 60); });
+
+const STEP_GOALS = [
+  "M1 (sent T+1). a) State our understanding of their business and problems, in their own words and numbers. b) Propose the scope at use-case level, choosing only what fits from: lead management, salesman on WhatsApp, collections, secondary ordering. c) Give one similar case study and the forwardable enterprise deck link " + DECK_URL + ". Close by asking them to confirm or correct the understanding (a yes or a correction is enough), and say the detailed workflow and price range come next.",
+  "M2 (sent T+2). THIS IS THE GATE EMAIL. a) Follow up on whether our understanding is right; if the client replied since M1, thank them and build what they said into the email. b) Say the detailed end-user workflow (journey) is attached, and name what it shows. c) Give the price range in the body, framed as 'similar companies have paid in this range', priced on active users and number of use cases, using the tier range below. Close with two time slots to lock the scope and promise the firm quotation the same day.",
+  "M3 (sent T+4). IF the notes or thread show the scope was agreed: say the firm quotation and scope of work are attached, list scope and price lines (use [final] where the number isn't in the notes), and ask for the PO or setup advance and a kickoff date. OTHERWISE: nudge for a final understanding of the scope so we can send the detailed proposal. Silence is usually timing, price or proof of work; address the one the notes or thread point to (or all three briefly), each tied back to the pains from the meeting. Ask for a one-word or one-line reply.",
+  "M4 (sent T+6). Anchor to their pain, state the likely impact of delaying the decision (no invented numbers), give one case study where we have already done it, and offer a light, paid first phase (one use case, one area, 30 days).",
+  "M5 onwards. Anchor to their pain again from a new angle, one new case study, keep the paid first phase on the table, close with two slots.",
+];
+function stepGoal(m, i){ if (i === 9) return "M10, the last email. Close the file politely, leave the door open, no pressure."; return STEP_GOALS[Math.min(i, 4)]; }
+
+function buildPrompt(m, i, replyMode, base, tx){
+  const p = PRICE[tierOf(m)];
+  const cases = (CASE_BY_INDUSTRY[m.industry] || ["Haldiram's","ITC Classmate","JK Cement"]).concat(scopeOf(m).map(k => MODULES[k].proof));
+  const caseLines = [...new Set(cases)].map(n => `- ${n}: ${CASES[n]}`).join("\n");
+  const thread = (m.emails||[]).slice(-6).map(e => `[${e.dir==="in" ? "CLIENT" : "ZOTOK"} · ${e.date} ${e.time} · ${e.subject}]\n${(e.body||"").slice(0,1500)}`).join("\n\n") || "(no emails yet)";
+  const notes = m.notesList.map(n => `- (${n.kind||"note"}, ${(n.at||"").slice(0,10)}) ${n.text}`).join("\n") || "(none)";
+  const limit = WORD_LIMIT[m.tier] || 180;
+  return `You write ONE follow-up email for a ZoTok salesperson. ZoTok is an agentic AI platform for B2B commerce on WhatsApp: lead management, secondary ordering, collections and salesman on WhatsApp, integrated with Tally, SAP and other ERPs, set up and run by the ZoTok team. The only goal of every email is to move this customer from S3 (demo done) to S4 (proposal and commercials accepted).
+
+THIS EMAIL: ${replyMode ? "A REPLY. The client wrote last. Answer exactly what they asked, using the notes and thread; hold the scheduled cadence. Close with two time slots." : stepGoal(m, i)}
+
+RULES
+- Subject line = their company name + the outcome. Never "ZoTok follow-up".
+- The first line is about them, not us.
+- Under ${limit} words, not counting the price lines.
+- At most one case study, only from the list below. Never name any other client.
+- Close with two specific time slots (${SLOTS[0]} or ${SLOTS[1]}) or a yes/no question.
+- Plain, direct Indian business English. ${tierOf(m)==="AC1" ? "An owner-run business: address them with 'ji'; a little Hinglish is fine." : "A structured company: keep it crisp and professional."}
+- Say "paid first phase", never "pilot". Say "use case", never "module".
+- Never invent numbers, names, prices, dates or facts. Where something needed is missing, write a short [bracket] for the salesperson to fill.
+- Price range for this tier (${tierOf(m)}), when the email calls for it: setup ${p.setup}; ${p.integ}; platform ${p.monthly}, ${p.basis}. Meta ad spend and WhatsApp conversation charges are billed at actuals.
+
+CASE STUDIES YOU MAY USE
+${caseLines}
+Enterprise deck: ${DECK_URL}
+
+CUSTOMER
+Company: ${m.company} · Tier: ${m.tier} · Industry: ${m.industry}
+Contact: ${m.contact}${m.role ? ", " + m.role : ""} · Salesperson: ${m.rep}
+Demo: ${iso(m.date)} (T+${m.daysAgo})${m.meetings.length > 1 ? " · meetings: " + m.meetings.join(", ") : ""}
+Pains heard: ${m.rawPains.join(" | ") || "not captured"}
+Scale: ${m.numbers.startsWith("[") ? "not captured" : m.numbers} · ERP: ${m.erp}
+Likely use cases: ${scopeOf(m).map(k => MODULES[k].name).join(", ")}
+Who decides: ${m.dm || "not captured"} · We promised: ${m.promised}
+
+SALESPERSON'S NOTES (calls, internal discussion; newest first)
+${notes}
+
+${tx ? "TRANSCRIPT OF THE MEETING (excerpt)\n" + tx.slice(0, 60000) + "\n\n" : ""}RECENT EMAIL THREAD (oldest first)
+${thread}
+
+BASE DRAFT (keep its structure; make it specific using everything above)
+SUBJECT: ${base.subject}
+${base.body}
+
+Sign off exactly as: ${sign(m)}
+
+Reply in exactly this format and nothing else:
+SUBJECT: <one line>
+BODY:
+<the email body>`;
+}
+function parseGen(t){ const s = t.match(/SUBJECT:\s*(.*)/); const b = t.split(/BODY:[ \t]*\n?/)[1]; return {subject: s ? s[1].trim() : "", body: b ? b.trim() : ""}; }
+
+async function generateEmail(){
+  const m = currentMeeting(); if (!AI || !m) return;
+  const replyMode = m.reply && !m.replyHandled && m.stage==="S3";
+  const i = state.step ?? 0; const key = draftKey();
+  const base = buildDraft(m, i);
+  const btn = $("#genEmail"), st = $("#genStatus");
+  state.busy = true; btn.disabled = true; st.textContent = "Claude is writing… ";
+  let tx = "";
+  if (DB && m.tx === "uploaded"){ try { const d = await DB.doc("transcripts/"+m.id).get(); if (d.exists) tx = d.data().text || ""; } catch(_){} }
+  try {
+    const res = await AI(buildPrompt(m, i, replyMode, base, tx), {modelTier:"default", cache:false, onText:({text}) => { const g = parseGen(text); if (g.subject && $("#subject")) $("#subject").value = g.subject; if (g.body && $("#body")) $("#body").value = g.body; }});
+    const g = parseGen(res.text);
+    if (!g.body) throw {code:"empty"};
+    const out = {subject: g.subject || base.subject, body: g.body};
+    state.drafts[key] = out;
+    if ($("#subject")){ $("#subject").value = out.subject; $("#body").value = out.body; runChecks(); }
+    st.textContent = res.truncated ? "Cut short. Edit it, or try again." : "Written by Claude. Review and edit, then copy.";
+    if (DB) DB.doc("drafts/"+key.replace(":","_")).set({meetingId:m.id, key, step:i, subject:out.subject, body:out.body, at:new Date().toISOString(), by:ME||""}).catch(() => {});
+  } catch(e){
+    st.textContent = e.code==="not_granted" ? "Claude access wasn't allowed for this page." : e.code==="rate_limited" ? "Too many requests right now. Try again in a minute." : e.code==="cancelled" ? "Stopped." : "Claude couldn't write this one. The base draft is still here.";
+  } finally { state.busy = false; btn.disabled = false; if (pending && !editing()){ pending = false; render(); } }
+}
+
+async function saveNote(){
+  const m = currentMeeting(); const box = $("#noteText"); const text = box.value.trim();
+  if (!text || !DB) return;
+  const btn = $("#saveNote"); btn.disabled = true;
+  try {
+    await DB.collection("notes").add({meetingId:m.id, kind:$("#noteKind").value, text:text.slice(0,4000), by:ME||"", at:new Date().toISOString()});
+    box.value = ""; box.blur(); toast("Note saved");
+  } catch(e){ toast(e.code==="invalid_argument" ? "You have view-only access, so notes can't be saved." : "Couldn't save the note. Try again."); }
+  finally { btn.disabled = false; }
+}
+
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,""); }
+function safeText(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"’").replace(/\\/g,""); }
+async function downloadJourneys(){
+  const m = currentMeeting();
+  if (!DL){ toast("Downloads aren't available in this view."); return; }
+  const brand = $("#jBrand").value.trim() || m.company;
+  const ini = ($("#jInit").value.trim() || initials(brand)).toUpperCase().slice(0,3);
+  const ind = $("#jInd").value.trim() || m.industry;
+  const keys = [...document.querySelectorAll("[data-jmod]:checked")].map(x => x.dataset.jmod);
+  if (!keys.length){ toast("Pick at least one journey."); return; }
+  for (const k of keys){
+    try {
+      const r = await fetch("journeys/" + MODULES[k].journey + ".html");
+      if (!r.ok) throw {code:"fetch"};
+      let h = await r.text();
+      h = h.split("{{BRAND}}").join(safeText(brand)).split("{{INITIALS}}").join(safeText(ini)).split("{{INDUSTRY}}").join(safeText(ind));
+      await DL.save({filename:`journey_${slug(brand)}_${MODULES[k].journey}.html`, data:new Blob([h], {type:"text/html"})});
+    } catch(e){
+      if (e && e.code === "declined") continue;
+      toast(e && e.code === "rate_limited" ? "Finish the open download first, then try again." : "Couldn't prepare that journey. Try again.");
+      break;
+    }
+  }
+}
+
+async function resolveNames(){
+  if (!USER || !USER.profiles) return;
+  const ids = [...new Set(Object.values(NOTES).flat().map(n => n.by).filter(Boolean))].filter(id => !(id in NAMES));
+  if (!ids.length) return;
+  try { const ps = await USER.profiles(ids); ids.forEach(id => { NAMES[id] = (ps[id] && ps[id].name) || "Someone"; }); safeRender(); } catch(_){}
+}
+
+render();
+(async () => {
+  const c = window.claude;
+  if (!c || !c.use){ BOOT_MSG = "Sign in with your ZoTok Microsoft account to load the pipeline."; $("#syncLbl").textContent = "Not connected"; render(); return; }
+  [DB, AI, DL, USER] = await Promise.all(["db","sample","downloads","user"].map(n => c.use(n).catch(() => null)));
+  if (!DB){ BOOT_MSG = "Sign in with your ZoTok Microsoft account to load the pipeline."; $("#syncLbl").textContent = "Not connected"; render(); return; }
+  try { ME = USER && USER.id ? await USER.id() : null; } catch(_){}
+  const err = e => { if (e && e.code === "revoked"){ BOOT_MSG = "Your access to this desk changed. Reload the page."; MEETINGS = []; render(); } };
+  DB.collection("meetings").onSnapshot(snap => { RAW = snap.docs.map(d => ({...d.data(), id:d.id})); if (!RAW.length) BOOT_MSG = "No meetings yet. The daily sync fills this in each morning."; rebuild(); safeRender(); }, err);
+  DB.collection("notes").onSnapshot(snap => { for (const k in NOTES) delete NOTES[k]; snap.docs.forEach(d => { const n = d.data(); (NOTES[n.meetingId] ||= []).push(n); }); Object.values(NOTES).forEach(l => l.sort((a,b) => (b.at||"").localeCompare(a.at||""))); resolveNames(); rebuild(); safeRender(); }, err);
+  DB.collection("drafts").onSnapshot(snap => { for (const k in GEN) delete GEN[k]; snap.docs.forEach(d => { const g = d.data(); if (g.key) GEN[g.key] = g; }); safeRender(); }, err);
+  DB.collection("flags").onSnapshot(snap => { for (const k in FLAGS) delete FLAGS[k]; snap.docs.forEach(d => { FLAGS[d.id] = d.data(); }); rebuild(); safeRender(); }, err);
+  DB.collection("txmeta").onSnapshot(snap => { for (const k in TXUP) delete TXUP[k]; snap.docs.forEach(d => { TXUP[d.id] = d.data(); }); rebuild(); safeRender(); }, err);
+  DB.doc("meta/sync").onSnapshot(d => { const v = d.exists ? d.data() : null; const t = v && v.lastRun ? new Date(v.lastRun) : null; $("#syncLbl").textContent = t ? `Synced ${fmtShort(t)}, ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}` : "Live"; }, err);
+})();
+
+})();
+</script>
+
+</body>
+</html>

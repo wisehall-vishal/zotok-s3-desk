@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{BRAND}} — Collections: PTP Incentives &amp; Scheme Unlock | ZoTok Journey</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brand:#E8201E;--brand-l:#eb4040;--accent:#FFD700;
+  --wa-top:#075E54;--wa-teal:#00A884;--wa-green:#25D366;
+  --chat-bg:#ECE5DD;--sender:#DCF8C6;--receiver:#FFFFFF;
+  --sidebar-w:256px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#eef0f3;display:flex;min-height:100vh;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sidebar-w);background:var(--brand);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;height:100vh;}
+.sb-brand{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.12);}
+.sb-logo{display:flex;align-items:center;gap:10px;}
+.sb-mark{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#333;flex-shrink:0;letter-spacing:-.3px;}
+.sb-company{font-size:14px;font-weight:700;color:#fff;line-height:1.25;}
+.sb-journey{font-size:10.5px;color:rgba(255,255,255,.42);margin-top:6px;line-height:1.4;}
+.sb-steps{padding:8px 0;flex:1;}
+.sb-step{padding:9px 18px 8px;cursor:pointer;border-left:3px solid transparent;transition:background .14s;}
+.sb-step:hover{background:rgba(255,255,255,.07);}
+.sb-step.active{background:rgba(255,255,255,.13);border-left-color:var(--accent);}
+.st-num{font-size:10px;font-weight:700;color:rgba(255,255,255,.36);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1px;}
+.st-title{font-size:12px;font-weight:600;color:#fff;line-height:1.35;}
+.st-meta{font-size:10px;color:rgba(255,255,255,.36);margin-top:1px;}
+.sb-step.active .st-num{color:rgba(255,215,0,.85);}
+.sb-step.alt .st-meta{color:rgba(255,180,100,.6);}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
+.topbar{background:#fff;border-bottom:1px solid #e0e0e0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tb-title{font-size:14.5px;font-weight:700;color:#111;}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.tb-client{font-size:12px;color:#888;}
+
+/* ── Screens area ── */
+.screens-area{flex:1;overflow-y:auto;padding:28px 24px;display:flex;align-items:flex-start;justify-content:center;}
+.step-panel{display:none;width:100%;}
+.step-panel.phone-layout{align-items:flex-start;justify-content:center;gap:22px;flex-wrap:wrap;}
+.step-panel.active{display:flex;}
+
+/* ── Nav bar ── */
+.nav-bar{background:#fff;border-top:1px solid #e0e0e0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.nav-btn{display:flex;align-items:center;gap:7px;padding:8px 20px;border-radius:8px;border:1.5px solid #e0e0e0;background:#fff;font-size:13px;font-weight:600;color:#444;cursor:pointer;transition:all .14s;}
+.nav-btn:hover:not(:disabled){background:#f5f5f5;}
+.nav-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);}
+.nav-btn.primary:hover:not(:disabled){background:var(--brand-l);}
+.nav-btn:disabled{opacity:.38;cursor:default;pointer-events:none;}
+.step-counter{font-size:13px;color:#888;}
+.step-counter strong{color:#111;}
+
+/* ── Phone wrap ── */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;}
+.screen-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-bottom:8px;}
+
+/* ── Phone frame ── */
+.phone{width:360px;border-radius:36px;border:7px solid #1a1a1a;box-shadow:0 20px 60px rgba(0,0,0,.26);overflow:hidden;display:flex;flex-direction:column;height:650px;background:var(--chat-bg);position:relative;flex-shrink:0;}
+
+/* ── Status bar ── */
+.st-bar{background:var(--wa-top);padding:8px 14px 5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.st-time{font-size:13px;font-weight:600;color:#fff;}
+.st-icons{display:flex;align-items:center;gap:5px;}
+
+/* ── WA Top bar ── */
+.wa-bar{background:var(--wa-top);padding:6px 10px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,.1);}
+.wa-back{color:#fff;line-height:1;display:flex;align-items:center;}
+.wa-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent) 0%,var(--brand) 100%);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.wa-info{flex:1;}
+.wa-name{font-size:14px;font-weight:600;color:#fff;line-height:1.2;}
+.wa-sub{font-size:11px;color:rgba(255,255,255,.72);}
+.wa-acts{display:flex;align-items:center;gap:14px;}
+
+/* ── Chat area ── */
+.chat{flex:1;overflow-y:auto;overflow-x:hidden;background-color:var(--chat-bg);background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b2a99a' fill-opacity='0.13'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");padding:10px 8px;display:flex;flex-direction:column;gap:4px;}
+
+/* Date chip */
+.date-chip{text-align:center;margin:4px 0;}
+.date-chip span{background:rgba(11,20,26,.12);color:#111B21;font-size:11px;padding:3px 10px;border-radius:8px;display:inline-block;}
+
+/* ── Message bubbles ── */
+.sw{display:flex;justify-content:flex-end;margin:2px 0;}
+.rw{display:flex;justify-content:flex-start;margin:2px 0;}
+.sb{background:var(--sender);border-radius:10px 0 10px 10px;padding:6px 9px 4px;max-width:72%;box-shadow:0 1px 1px rgba(0,0,0,.1);}
+.rb{background:var(--receiver);border-radius:0 10px 10px 10px;padding:6px 9px 4px;max-width:84%;box-shadow:0 1px 1px rgba(0,0,0,.1);}
+.mb{font-size:13.5px;color:#111B21;line-height:1.45;}
+.mt{font-size:10.5px;color:#667781;display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:2px;}
+.tick{color:#53bdeb;}
+
+/* ── Template card ── */
+.tc{background:#fff;border-radius:0 8px 8px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.13);max-width:88%;}
+.tc.faded{opacity:.55;}
+.th-txt{background:#f5f5f5;padding:8px 12px;font-size:14px;font-weight:700;color:#111B21;}
+.th-qr{background:#fff;padding:14px 0 10px;border-bottom:1px solid #f0f0f0;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.tb{padding:8px 12px 4px;font-size:13px;color:#111B21;line-height:1.52;}
+.tf{padding:1px 12px 6px;font-size:10.5px;color:#667781;}
+.tt{font-size:10.5px;color:#667781;text-align:right;padding:0 12px 6px;}
+.tdiv{border:none;border-top:1px solid #f0f0f0;display:block;}
+.tbtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px 12px;font-size:13.5px;font-weight:600;color:var(--wa-teal);background:none;border:none;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.tbtn:last-child{border-bottom:none;}
+.zf{font-size:9.5px;color:#8696a0;text-align:center;padding:3px 0 0;}
+
+/* ── Interactive Reply Buttons ── */
+.im{background:#fff;border-radius:0 8px 8px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.13);max-width:88%;}
+.im.faded{opacity:.55;}
+.im-body{padding:8px 12px 4px;font-size:13px;color:#111B21;line-height:1.52;}
+.im-time{font-size:10.5px;color:#667781;text-align:right;padding:0 12px 6px;}
+.im-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:11px 12px;font-size:13.5px;font-weight:600;color:var(--wa-teal);background:none;border:none;border-top:1px solid #f0f0f0;cursor:pointer;}
+
+/* ── Input bar ── */
+.in-bar{background:#f0f0f0;padding:6px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.in-plus{color:#54656f;display:flex;align-items:center;}
+.in-field{flex:1;background:#fff;border-radius:22px;padding:7px 14px;font-size:13px;color:#8696a0;display:flex;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+.in-icons{display:flex;align-items:center;gap:12px;color:#54656f;}
+
+/* Reusable icon SVGs */
+.ic-signal{display:inline-flex;}
+.tag-loss{background:#FFF3E0;color:#E65100;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:600;display:inline-block;margin:4px 0;}
+.tag-win{background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:600;display:inline-block;margin:4px 0;}
+
+/* ── Functional tags ── */
+.tag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin:2px 2px 0 0;}
+.tag-col{background:#e3f2fd;color:#0d47a1;}
+.tag-ai{background:#ede7f6;color:#4527A0;}
+.tag-pay{background:#e0f2f1;color:#00695C;}
+.tag-sch{background:#f9fbe7;color:#558B2F;}
+.tag-esc{background:#fce4ec;color:#880E4F;}
+.tag-act{background:#fff3e0;color:#E65100;}
+.tag-ord{background:#e8f5e9;color:#1B5E20;}
+
+/* ── Step desc bar ── */
+#step-desc-bar{background:#fff;border-bottom:1px solid #eee;padding:9px 28px 8px;font-size:12.5px;color:#444;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;min-height:38px;}
+
+/* ── Screen desc (desktop) ── */
+.screen-desc{width:360px;background:rgba(255,255,255,0.92);border-radius:12px;padding:10px 14px 11px;font-size:13px;line-height:1.5;color:#2a2a2a;margin-top:10px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.screen-desc strong{font-size:13.5px;font-weight:700;color:#111;display:block;margin-bottom:3px;}
+
+@media (max-width:768px){
+  body{flex-direction:column;overflow:hidden;}
+  .sidebar{display:none;}
+  .main{height:100vh;height:100dvh;}
+  #step-desc-bar{display:none;}
+  .topbar{padding:10px 16px;}
+  .tb-title{font-size:12.5px;}
+  .screens-area{padding:12px 0;overflow:hidden;align-items:center;}
+  .step-panel.phone-layout{justify-content:center;padding:0 12px;}
+  .phone{width:calc(100vw - 32px);max-width:360px;height:calc(100dvh - 140px);}
+  .nav-bar{padding:10px 16px;}
+
+  .screen-desc{
+    position:fixed !important;
+    left:16px !important; right:16px !important;
+    bottom:58px !important;
+    width:auto !important; max-width:none !important;
+    z-index:200;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.5s ease;
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    border-radius:14px !important;
+    box-shadow:0 8px 28px rgba(0,0,0,0.18) !important;
+    font-size:13px !important;
+    margin-top:0 !important;
+  }
+  .screen-desc.desc-visible{opacity:0.93;pointer-events:auto;}
+  .screen-desc strong{font-size:13.5px !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-mark" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;background:var(--brand,#0E6B55);">{{INITIALS}}</div>
+      <div>
+        <div class="sb-company">{{BRAND}}</div>
+      </div>
+    </div>
+    <div class="sb-journey">Collections · PTP &amp; Scheme Unlock Journey</div>
+  </div>
+  <div class="sb-steps">
+    <div class="sb-step active" id="sbstep-1" onclick="goTo(1)">
+      <div class="st-num">Step 1</div>
+      <div class="st-title">Automated Payment Reminder</div>
+      <div class="st-meta">AI reminder · Outstanding QR</div>
+    </div>
+    <div class="sb-step" id="sbstep-2" onclick="goTo(2)">
+      <div class="st-num">Step 2</div>
+      <div class="st-title">Retailer Checks Invoices</div>
+      <div class="st-meta">AI · Invoice breakdown</div>
+    </div>
+    <div class="sb-step" id="sbstep-3" onclick="goTo(3)">
+      <div class="st-num">Step 3</div>
+      <div class="st-title">AI Initiates PTP + Scheme</div>
+      <div class="st-meta">AI PTP · Scheme hook</div>
+    </div>
+    <div class="sb-step" id="sbstep-4" onclick="goTo(4)">
+      <div class="st-num">Step 4</div>
+      <div class="st-title">Retailer Declines Initial Date</div>
+      <div class="st-meta">Retailer response · Decline</div>
+    </div>
+    <div class="sb-step" id="sbstep-5" onclick="goTo(5)">
+      <div class="st-num">Step 5</div>
+      <div class="st-title">AI Asks Alternate Date</div>
+      <div class="st-meta">AI · Alternate date options</div>
+    </div>
+    <div class="sb-step" id="sbstep-6" onclick="goTo(6)">
+      <div class="st-num">Step 6</div>
+      <div class="st-title">Retailer Selects Friday</div>
+      <div class="st-meta">Retailer · Date commitment</div>
+    </div>
+    <div class="sb-step" id="sbstep-7" onclick="goTo(7)">
+      <div class="st-num">Step 7</div>
+      <div class="st-title">Scheme Unlocked for Friday</div>
+      <div class="st-meta">Scheme unlock · Incentive</div>
+    </div>
+    <div class="sb-step" id="sbstep-8" onclick="goTo(8)">
+      <div class="st-num">Step 8</div>
+      <div class="st-title">PTP Confirmed</div>
+      <div class="st-meta">PTP logged · Confirmation</div>
+    </div>
+    <div class="sb-step" id="sbstep-9" onclick="goTo(9)">
+      <div class="st-num">Step 9</div>
+      <div class="st-title">Pre-Due Reminder (Thursday)</div>
+      <div class="st-meta">Pre-due reminder · Pay Now</div>
+    </div>
+    <div class="sb-step" id="sbstep-10" onclick="goTo(10)">
+      <div class="st-num">Step 10</div>
+      <div class="st-title">Payment Received ✅</div>
+      <div class="st-meta">Payment closed · Scheme active</div>
+    </div>
+    <div class="sb-step alt" id="sbstep-11" onclick="goTo(11)">
+      <div class="st-num">Step 11</div>
+      <div class="st-title">Payment Not Received ❌</div>
+      <div class="st-meta">Missed PTP · Re-engage</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tb-step-title">Automated Payment Reminder</div>
+    <div class="tb-right">
+      <div class="tb-dot"></div>
+      <div class="tb-client">{{BRAND}} · Collections &amp; Credit</div>
+    </div>
+  </div>
+
+  <div id="step-desc-bar"></div>
+  <div class="screens-area">
+
+    <!-- ═══════════════════════════ STEP 1 ═══════════════════════════ -->
+    <div class="step-panel phone-layout active" id="step-1">
+      <div class="phone-wrap">
+        <div class="screen-label">Automated Payment Reminder — Utility Template</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:22</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info">
+              <div class="wa-name">{{BRAND}} Payment Assist</div>
+              <div class="wa-sub">Business Account</div>
+            </div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <div class="rw">
+              <div>
+                <div class="tc">
+                  <!-- Header: Image — dynamic QR per customer via API -->
+                  <div class="th-qr">
+                    <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="90" height="90" fill="white"/>
+                      <rect x="5" y="5" width="24" height="24" rx="3" fill="#111"/><rect x="9" y="9" width="16" height="16" rx="1.5" fill="white"/><rect x="13" y="13" width="8" height="8" fill="#111"/>
+                      <rect x="61" y="5" width="24" height="24" rx="3" fill="#111"/><rect x="65" y="9" width="16" height="16" rx="1.5" fill="white"/><rect x="69" y="13" width="8" height="8" fill="#111"/>
+                      <rect x="5" y="61" width="24" height="24" rx="3" fill="#111"/><rect x="9" y="65" width="16" height="16" rx="1.5" fill="white"/><rect x="13" y="69" width="8" height="8" fill="#111"/>
+                      <rect x="35" y="5" width="5" height="5" fill="#111"/><rect x="43" y="5" width="5" height="5" fill="#111"/><rect x="51" y="5" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="13" width="5" height="5" fill="#111"/><rect x="51" y="13" width="5" height="5" fill="#111"/>
+                      <rect x="43" y="21" width="5" height="5" fill="#111"/><rect x="35" y="21" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="35" width="5" height="5" fill="#111"/><rect x="43" y="35" width="5" height="5" fill="#111"/><rect x="53" y="35" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="43" width="5" height="5" fill="#111"/><rect x="53" y="43" width="5" height="5" fill="#111"/>
+                      <rect x="43" y="53" width="5" height="5" fill="#111"/><rect x="53" y="53" width="5" height="5" fill="#111"/>
+                      <rect x="61" y="35" width="5" height="5" fill="#111"/><rect x="71" y="35" width="5" height="5" fill="#111"/><rect x="79" y="35" width="5" height="5" fill="#111"/>
+                      <rect x="61" y="43" width="5" height="5" fill="#111"/><rect x="79" y="43" width="5" height="5" fill="#111"/>
+                      <rect x="71" y="53" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="61" width="5" height="5" fill="#111"/><rect x="43" y="61" width="5" height="5" fill="#111"/><rect x="53" y="61" width="5" height="5" fill="#111"/>
+                      <rect x="61" y="61" width="5" height="5" fill="#111"/><rect x="79" y="61" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="71" width="5" height="5" fill="#111"/><rect x="53" y="71" width="5" height="5" fill="#111"/><rect x="71" y="71" width="5" height="5" fill="#111"/>
+                      <rect x="35" y="79" width="5" height="5" fill="#111"/><rect x="43" y="79" width="5" height="5" fill="#111"/><rect x="61" y="79" width="5" height="5" fill="#111"/><rect x="79" y="79" width="5" height="5" fill="#111"/>
+                    </svg>
+                    <div style="font-size:9px;color:#999;text-align:center;letter-spacing:.3px;">Dynamic QR · Sent per customer via API</div>
+                    <div style="font-size:10px;font-weight:700;color:#E8201E;">gupta.traders@hdfcbank</div>
+                  </div>
+                  <!-- Body -->
+                  <div class="tb">Namaste Gupta ji 🙏<br><br>Aapka {{BRAND}} ka <strong>₹48,500</strong> outstanding pending hai<br>Last supply: 7 days<br><br>Aaj payment karne par aapko next order pe extra scheme mil sakta hai 💰<br><br>Team, {{BRAND}}</div>
+                  <!-- Footer: plain text, ≤60 chars -->
+                  <div class="tf">Managed by ZoTok powered by Zono</div>
+                  <div class="tt">10:22 AM ✓✓</div>
+                  <!-- CTA URL buttons -->
+                  <span class="tdiv"></span>
+                  <button class="tbtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Invoice dekhein
+                  </button>
+                  <button class="tbtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Scheme check karein
+                  </button>
+                </div>
+                <div class="zf">Managed by ZoTok powered by Zono</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#e8f0fe;"><strong>Automated Payment Reminder</strong>ZoAi sends a personalised outstanding payment reminder with a dynamic UPI QR code — no salesman needed.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 2 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-2">
+      <div class="phone-wrap">
+        <div class="screen-label">Invoice Breakdown — Session Message</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:24</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- Prior template — condensed & faded -->
+            <div class="rw">
+              <div class="tc faded" style="max-width:88%;">
+                <div class="tb" style="font-size:11.5px;padding:5px 12px 3px;">Namaste Gupta ji 🙏 — outstanding <strong>₹48,500</strong> · Last supply: 7 days</div>
+                <div class="tt" style="padding:0 12px 4px;font-size:10px;">10:22 AM ✓✓</div>
+                <span class="tdiv"></span>
+                <div style="display:flex;">
+                  <button class="tbtn" style="font-size:12px;padding:7px 12px;border-right:1px solid #f0f0f0;">Invoice dekhein</button>
+                  <button class="tbtn" style="font-size:12px;padding:7px 12px;">Scheme check karein</button>
+                </div>
+              </div>
+            </div>
+            <!-- AI sends invoice breakdown -->
+            <div class="rw">
+              <div class="rb">
+                <div class="mb">Invoice-wise breakup:<br><br><strong>Invoice #HD-45821</strong> — ₹18,200<br>Items: Traditional Basmati, Mini Basmati<br><br><strong>Invoice #HD-46210</strong> — ₹30,300<br>Items: Combo Packs<br><br><strong>Total Outstanding: ₹48,500</strong></div>
+                <div class="mt">10:24 AM</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#e8f5e9;"><strong>AI-Driven Invoice Breakdown</strong>Retailer asks about pending bills — ZoAi instantly shares invoice-wise details within the WhatsApp thread.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-3">
+      <div class="phone-wrap">
+        <div class="screen-label">AI Initiates Promise-to-Pay + Scheme Hook — Interactive Reply</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:25</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- Interactive Reply Buttons — session message -->
+            <div class="rw">
+              <div class="im">
+                <div class="im-body">Agar aap <strong>Tuesday, 15 Apr</strong> tak payment karte hain:<br><br>🎁 2% extra scheme next order pe<br>🎁 Fast delivery priority milegi<br><br>Kya aap Tuesday tak payment kar paayenge?</div>
+                <div class="im-time">10:25 AM</div>
+                <!-- Reply buttons: "Kar dunga" (9 chars ✓) | "Nahi ho paayega" (15 chars ✓) — both ≤20 -->
+                <button class="im-btn">Kar dunga</button>
+                <button class="im-btn">Nahi ho paayega</button>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#ede7f6;"><strong>AI Initiates PTP + Scheme Hook</strong>ZoAi presents a time-sensitive scheme incentive to nudge the retailer to commit to a payment date.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 4 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-4">
+      <div class="phone-wrap">
+        <div class="screen-label">Retailer Declines — Taps "Nahi ho paayega"</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:26</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- PTP message — faded -->
+            <div class="rw">
+              <div class="im faded">
+                <div class="im-body" style="font-size:11.5px;">Agar aap <strong>Tuesday, 15 Apr</strong> tak payment karte hain:<br>🎁 2% extra scheme · 🎁 Fast delivery priority</div>
+                <div class="im-time" style="font-size:10px;">10:25 AM</div>
+                <button class="im-btn" style="font-size:12px;padding:8px 12px;">Kar dunga</button>
+                <button class="im-btn" style="font-size:12px;padding:8px 12px;">Nahi ho paayega</button>
+              </div>
+            </div>
+            <!-- User taps "Nahi ho paayega" -->
+            <div class="sw">
+              <div class="sb">
+                <div class="mb">Nahi ho paayega</div>
+                <div class="mt">10:26 AM <span class="tick">✓✓</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#fff3e0;"><strong>Retailer Declines — AI Handles Gracefully</strong>Retailer taps "Nahi ho paayega" — ZoAi acknowledges and pivots to negotiation without losing the conversation.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 5 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-5">
+      <div class="phone-wrap">
+        <div class="screen-label">AI Asks Alternate Date — Warm Tone + 3 Options</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:26</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- User's prior reply — faded -->
+            <div class="sw">
+              <div class="sb" style="opacity:.55;">
+                <div class="mb" style="font-size:12px;">Nahi ho paayega</div>
+                <div class="mt" style="font-size:10px;">10:26 AM <span class="tick">✓✓</span></div>
+              </div>
+            </div>
+            <!-- AI asks for alternate date -->
+            <div class="rw">
+              <div class="im">
+                <div class="im-body">Samajh gaya 👍<br><br>Aap kaunsa din comfortable rahenge?<br><br>Main check karta hoon us date pe kaunsa scheme unlock hoga</div>
+                <div class="im-time">10:26 AM</div>
+                <!-- Reply buttons: "Thursday" (8) | "Friday" (6) | "Next Week" (9) — all ≤20 ✓ -->
+                <button class="im-btn">Thursday</button>
+                <button class="im-btn">Friday</button>
+                <button class="im-btn">Next Week</button>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#e0f7fa;"><strong>AI Offers Alternate Payment Dates</strong>ZoAi proposes flexible dates with scheme unlocks — retailer picks what works for their cashflow.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 6 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-6">
+      <div class="phone-wrap">
+        <div class="screen-label">Retailer Selects Alternate Date — Taps "Friday"</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:27</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- Date selection message — faded -->
+            <div class="rw">
+              <div class="im faded">
+                <div class="im-body" style="font-size:11.5px;">Samajh gaya 👍 Aap kaunsa din comfortable rahenge?<br>Main check karta hoon us date pe kaunsa scheme unlock hoga</div>
+                <div class="im-time" style="font-size:10px;">10:26 AM</div>
+                <div style="display:flex;border-top:1px solid #f0f0f0;">
+                  <button class="im-btn" style="font-size:12px;padding:8px;border-top:none;border-right:1px solid #f0f0f0;border-bottom:none;border-left:none;">Thursday</button>
+                  <button class="im-btn" style="font-size:12px;padding:8px;border-top:none;border-right:1px solid #f0f0f0;border-bottom:none;border-left:none;">Friday</button>
+                  <button class="im-btn" style="font-size:12px;padding:8px;border-top:none;border-bottom:none;border-left:none;border-right:none;">Next Week</button>
+                </div>
+              </div>
+            </div>
+            <!-- User taps "Friday" -->
+            <div class="sw">
+              <div class="sb">
+                <div class="mb">Friday</div>
+                <div class="mt">10:27 AM <span class="tick">✓✓</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#f9fbe7;"><strong>Retailer Commits to Friday</strong>Retailer selects Friday — ZoAi captures the promise-to-pay and queues the confirmation flow.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 7 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-7">
+      <div class="phone-wrap">
+        <div class="screen-label">Scheme Unlocked for Friday — Interactive Reply + Confirm CTA</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:27</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- User's "Friday" — faded -->
+            <div class="sw">
+              <div class="sb" style="opacity:.55;">
+                <div class="mb" style="font-size:12px;">Friday</div>
+                <div class="mt" style="font-size:10px;">10:27 AM <span class="tick">✓✓</span></div>
+              </div>
+            </div>
+            <!-- AI discloses scheme for Friday -->
+            <div class="rw">
+              <div class="im">
+                <div class="im-body">Agar aap <strong>Friday, 18 Apr</strong> tak payment karte hain:<br><br>🎁 1% extra scheme next order pe<br>🎁 High-moving SKUs priority allocation<br>🎁 Festival scheme eligibility unlock<br><br>Confirm karna chahenge?</div>
+                <div class="im-time">10:27 AM</div>
+                <!-- Single reply button: "Confirm karein" (14 chars ✓) -->
+                <button class="im-btn" style="font-weight:700;color:#00A884;">Confirm karein</button>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#f3e5f5;"><strong>Scheme Unlocked for PTP Date</strong>ZoAi automatically unlocks the applicable scheme benefit tied to the committed payment date.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 8 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-8">
+      <div class="phone-wrap">
+        <div class="screen-label">Retailer Confirms PTP — Promise Registered</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">10:28</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">online</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Monday, 14 Apr 2025</span></div>
+            <!-- Prior scheme message — faded -->
+            <div class="rw">
+              <div class="im faded">
+                <div class="im-body" style="font-size:11.5px;">Friday, 18 Apr tak: 🎁 1% extra scheme · 🎁 SKU priority · 🎁 Festival eligibility</div>
+                <div class="im-time" style="font-size:10px;">10:27 AM</div>
+                <button class="im-btn" style="font-size:12px;padding:8px;">Confirm karein</button>
+              </div>
+            </div>
+            <!-- User confirms -->
+            <div class="sw">
+              <div class="sb">
+                <div class="mb">Confirm karein</div>
+                <div class="mt">10:28 AM <span class="tick">✓✓</span></div>
+              </div>
+            </div>
+            <!-- AI confirmation -->
+            <div class="rw">
+              <div class="rb">
+                <div class="mb">Perfect 👍<br><br>Aapka Promise-to-Pay register ho gaya hai:<br><br>Amount: <strong>₹48,500</strong><br>Date: <strong>Friday, 18 Apr 2025</strong><br><br>Is payment par aapko 1% scheme benefit milega<br>Main ek din pehle reminder bhej dunga 🔔</div>
+                <div class="mt">10:28 AM</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#e8eaf6;"><strong>PTP Confirmed & Logged</strong>Promise-to-pay is registered in ZoTok — sales team and distributor are notified automatically.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 9 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-9">
+      <div class="phone-wrap">
+        <div class="screen-label">Pre-Due Reminder (Thursday) — Utility Template + Pay Now CTA</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">09:15</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">Business Account</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Thursday, 17 Apr 2025</span></div>
+            <!-- Utility Template: Text header + body + CTA -->
+            <div class="rw">
+              <div>
+                <div class="tc">
+                  <!-- Header: Text type "Payment Reminder" (16 chars ✓) -->
+                  <div class="th-txt">Payment Reminder</div>
+                  <!-- Body -->
+                  <div class="tb">Reminder 😊<br><br>Aapne kal payment ka commitment diya tha<br><br>On-time payment se:<br>🎁 Extra scheme unlock hoga<br>🎁 Fast dispatch milega<br><br>Payment link yahan hai 👇<br><br>Team, {{BRAND}}</div>
+                  <!-- Footer: plain text ≤60 chars -->
+                  <div class="tf">Managed by ZoTok powered by Zono</div>
+                  <div class="tt">9:15 AM ✓✓</div>
+                  <!-- CTA URL button: "Pay Now" (7 chars ✓) -->
+                  <span class="tdiv"></span>
+                  <button class="tbtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Pay Now
+                  </button>
+                </div>
+                <div class="zf">Managed by ZoTok powered by Zono</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#fff8e1;"><strong>Pre-Due Reminder Sent</strong>ZoAi sends a warm reminder a day before PTP date, reinforcing the scheme benefit to maximise collection success.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 10 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-10">
+      <div class="phone-wrap">
+        <div class="screen-label">Payment Received — Utility Template · Scheme Benefit Confirmed</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">14:38</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">Business Account</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Friday, 18 Apr 2025</span></div>
+            <!-- Utility Template: Text header "Payment Received" (16 chars ✓) — no buttons -->
+            <div class="rw">
+              <div>
+                <div class="tc">
+                  <div class="th-txt">Payment Received</div>
+                  <div class="tb">Payment receive ho gaya hai ✅<br><br>Aapka 1% scheme benefit unlock ho gaya hai 🎉<br><br>Next order par aapko:<br>✔ Extra scheme<br>✔ Priority supply<br><br>Dhanyawaad<br><br>Team, {{BRAND}}</div>
+                  <div class="tf">Managed by ZoTok powered by Zono</div>
+                  <div class="tt">2:38 PM ✓✓</div>
+                </div>
+                <div class="zf">Managed by ZoTok powered by Zono</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#e8f5e9;"><strong>Payment Received — Collection Closed</strong>Payment confirmed — ZoAi immediately notifies the retailer, activates the scheme benefit, and closes the collection cycle.</div>
+    </div>
+
+    <!-- ═══════════════════════════ STEP 11 ═══════════════════════════ -->
+    <div class="step-panel phone-layout" id="step-11">
+      <div class="phone-wrap">
+        <div class="screen-label">Alternate Path — Payment Not Received · Re-Engage</div>
+        <div class="phone">
+          <div class="st-bar">
+            <span class="st-time">09:30</span>
+            <div class="st-icons">
+              <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx=".5" fill="#fff"/><rect x="4" y="4.5" width="3" height="6.5" rx=".5" fill="#fff"/><rect x="8" y="2" width="3" height="9" rx=".5" fill="#fff"/><rect x="12" y="0" width="3" height="11" rx=".5" fill="#fff"/></svg>
+              <svg width="15" height="11" viewBox="0 0 24 18" fill="none"><path d="M12 14a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/><path d="M5.6 9.4a9 9 0 0112.8 0" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M2 5.8A14 14 0 0122 5.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0" y="1" width="18" height="10" rx="2" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><rect x="1.5" y="2.5" width="14.5" height="7" rx="1" fill="#fff"/><path d="M19 4v4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="wa-bar">
+            <div class="wa-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wa-av" style="background:none;overflow:hidden;padding:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:12px;color:#fff;background:var(--brand,#0E6B55);border-radius:50%;">{{INITIALS}}</span></div>
+            <div class="wa-info"><div class="wa-name">{{BRAND}} Payment Assist</div><div class="wa-sub">Business Account</div></div>
+            <div class="wa-acts">
+              <svg width="20" height="14" viewBox="0 0 24 17" fill="none"><rect x="1" y="1" width="15" height="15" rx="2" stroke="#fff" stroke-width="2"/><path d="M16 6l7-4v13l-7-4V6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="chat">
+            <div class="date-chip"><span>Saturday, 19 Apr 2025</span></div>
+            <!-- Utility Template: Text header "Payment Overdue" + Quick Reply buttons -->
+            <div class="rw">
+              <div>
+                <div class="tc">
+                  <div class="th-txt">Payment Overdue</div>
+                  <div class="tb">Aapka committed payment miss ho gaya hai ❌<br><br>Kya aap naya date share karna chahenge?<br><br>Team, {{BRAND}}</div>
+                  <div class="tf">Managed by ZoTok powered by Zono</div>
+                  <div class="tt">9:30 AM ✓✓</div>
+                  <!-- Quick Reply buttons: "Naya date dein" (14 chars ✓) | "Salesman se baat" (16 chars ✓) — both ≤25 -->
+                  <span class="tdiv"></span>
+                  <button class="tbtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="9 11 12 14 22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Naya date dein
+                  </button>
+                  <button class="tbtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.57A2 2 0 012.06 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Salesman se baat karein
+                  </button>
+                </div>
+                <div class="zf">Managed by ZoTok powered by Zono</div>
+              </div>
+            </div>
+          </div>
+          <div class="in-bar">
+            <div class="in-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#54656f" stroke-width="1.8"/><path d="M12 8v8M8 12h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div class="in-field">Type a message</div>
+            <div class="in-icons">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#54656f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#54656f" stroke-width="1.8"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="#54656f" stroke-width="1.8"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="#54656f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="screen-desc" style="background:#fce4ec;"><strong>Alternate Path — Missed PTP</strong>Payment not received on committed date — ZoAi re-engages with a fresh date request or escalates to the field salesman.</div>
+    </div>
+
+  </div><!-- /screens-area -->
+
+  <!-- ── Nav bar ── -->
+  <div class="nav-bar">
+    <button class="nav-btn" id="prev-btn" onclick="goTo(currentStep-1)" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Previous
+    </button>
+    <span class="step-counter">Step <strong id="counter-cur">1</strong> of <strong>11</strong></span>
+    <button class="nav-btn primary" id="next-btn" onclick="goTo(currentStep+1)">
+      Next
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+var currentStep = 1;
+var totalSteps = 11;
+
+var stepData = [
+  null,
+  {title:'Step 1 — Automated Payment Reminder', desc:'<span style="color:#555;font-size:12px;">ZoAi sends personalised outstanding reminders with dynamic UPI QR — zero salesman effort for routine collections</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span><span class="tag tag-pay">Payments</span>'},
+  {title:'Step 2 — Invoice Breakdown', desc:'<span style="color:#555;font-size:12px;">Retailer queries pending bills — AI instantly shares invoice-wise breakdown within WhatsApp</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span>'},
+  {title:'Step 3 — AI Initiates PTP + Scheme Hook', desc:'<span style="color:#555;font-size:12px;">ZoAi presents a time-sensitive scheme incentive to nudge the retailer towards committing a payment date</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span><span class="tag tag-sch">Scheme</span>'},
+  {title:'Step 4 — Retailer Declines Initial Date', desc:'<span style="color:#555;font-size:12px;">Retailer says "not possible" — AI handles the decline gracefully and pivots to flexible negotiation</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span>'},
+  {title:'Step 5 — AI Offers Alternate Dates', desc:'<span style="color:#555;font-size:12px;">ZoAi proposes multiple payment dates with scheme previews — retailer picks what suits their cashflow</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span><span class="tag tag-sch">Scheme</span>'},
+  {title:'Step 6 — Retailer Commits to Friday', desc:'<span style="color:#555;font-size:12px;">Retailer selects a date — ZoAi captures the promise-to-pay and confirms the commitment</span><span class="tag tag-col">Collections</span>'},
+  {title:'Step 7 — Scheme Unlocked', desc:'<span style="color:#555;font-size:12px;">ZoAi automatically unlocks the applicable scheme benefit tied to the committed PTP date</span><span class="tag tag-col">Collections</span><span class="tag tag-sch">Scheme</span>'},
+  {title:'Step 8 — PTP Confirmed', desc:'<span style="color:#555;font-size:12px;">Promise-to-pay logged in ZoTok — distributor and sales team notified automatically</span><span class="tag tag-col">Collections</span>'},
+  {title:'Step 9 — Pre-Due Reminder', desc:'<span style="color:#555;font-size:12px;">ZoAi sends a timely reminder a day before PTP date, reinforcing scheme incentive to maximise collection</span><span class="tag tag-col">Collections</span><span class="tag tag-ai">AI Agents</span>'},
+  {title:'Step 10 — Payment Received', desc:'<span style="color:#555;font-size:12px;">Payment confirmed — scheme activated, collection cycle closed, retailer notified automatically</span><span class="tag tag-col">Collections</span><span class="tag tag-pay">Payments</span><span class="tag tag-sch">Scheme</span>'},
+  {title:'Step 11 — Missed PTP (Alternate Path)', desc:'<span style="color:#555;font-size:12px;">Payment not received — ZoAi re-engages with a fresh date or escalates to field salesman for intervention</span><span class="tag tag-col">Collections</span><span class="tag tag-esc">Escalation</span>'},
+];
+
+var descTimer = null;
+
+function goTo(n) {
+  if (n < 1 || n > totalSteps) return;
+  var prev = document.getElementById('step-' + currentStep);
+  var prevSb = document.getElementById('sbstep-' + currentStep);
+  if (prev) prev.classList.remove('active');
+  if (prevSb) prevSb.classList.remove('active');
+  currentStep = n;
+  var next = document.getElementById('step-' + currentStep);
+  var nextSb = document.getElementById('sbstep-' + currentStep);
+  if (next) next.classList.add('active');
+  if (nextSb) nextSb.classList.add('active');
+  document.getElementById('counter-cur').textContent = currentStep;
+  document.getElementById('prev-btn').disabled = (currentStep === 1);
+  document.getElementById('next-btn').disabled = (currentStep === totalSteps);
+  // Update step desc bar
+  var sd = stepData[currentStep];
+  if (sd) {
+    var bar = document.getElementById('step-desc-bar');
+    if (bar) bar.innerHTML = '<strong style="font-size:12.5px;color:#111;margin-right:6px;">' + sd.title + '</strong>' + sd.desc;
+    var tbTitle = document.getElementById('tb-step-title');
+    if (tbTitle) tbTitle.textContent = sd.title.replace('Step ' + currentStep + ' — ', '');
+  }
+  // Screen desc mobile
+  clearTimeout(descTimer);
+  document.querySelectorAll('.screen-desc').forEach(function(el){ el.classList.remove('desc-visible'); });
+  var currentPanel = document.getElementById('step-' + currentStep);
+  var currentDesc = currentPanel ? currentPanel.querySelector('.screen-desc') : null;
+  if (currentDesc) { descTimer = setTimeout(function(){ currentDesc.classList.add('desc-visible'); }, 1500); }
+  setTimeout(function(){
+    var chat = document.querySelector('#step-' + currentStep + ' .chat');
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }, 50);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') goTo(currentStep + 1);
+  if (e.key === 'ArrowLeft') goTo(currentStep - 1);
+});
+// Init desc bar
+(function(){
+  var sd = stepData[1];
+  if (sd) {
+    var bar = document.getElementById('step-desc-bar');
+    if (bar) bar.innerHTML = '<strong style="font-size:12.5px;color:#111;margin-right:6px;">' + sd.title + '</strong>' + sd.desc;
+  }
+  var currentDesc = document.querySelector('#step-1 .screen-desc');
+  if (currentDesc) { descTimer = setTimeout(function(){ currentDesc.classList.add('desc-visible'); }, 1500); }
+})();
+</script>
+</body>
+</html>
