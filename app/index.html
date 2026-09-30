@@ -460,7 +460,7 @@ function buildDraft(m, i, ref){
       subject = `${m.company}: your WhatsApp workflow + price range`;
       body = `Hi ${f},\n\n${rep ? "Thank you for your reply. I've built what you said into the workflow below." : "Following up on my last note. If anything in my understanding was off, just reply and I'll correct it."}\n\nAttached is the step-by-step journey for ${m.company}: ${scope.map(s => s.journeyName.toLowerCase()).join("; ")}. It shows exactly what your ${/dealer/i.test(P1+P2)?"dealers":"retailers"} and team will see on WhatsApp.\n\nPricing is based on active users and the number of use cases.\n\n${priceBlock(m)}\n\nCan we lock the scope on a 20-minute call, ${s1} or ${s2}? I'll send the firm quotation the same day.\n\n${sign(m)}`;
       why = "M2 is the gate: confirm the understanding, attach the end-user journey, and put the price range in the body. Nothing moves to S4 without this email.";
-      scope.forEach(s => att.push({n:`${m.company} journey: ${s.journeyName} (use Download journey)`, s:"Journey"}));
+      scope.forEach(s => att.push({n:`${m.company} journey: ${s.journeyName}`, s:"Journey"}));
       break;
     }
     case 2:
