@@ -739,7 +739,7 @@ function renderPulse(){
     return `<tr><td>${tierChip(t)}</td><td class="n">${ms.length}</td><td class="n">${rep}</td><td class="n">${s4}</td><td class="n">${ms.length?Math.round(s4/ms.length*100):0}%</td></tr>`;
   }).join("");
   return `<div class="pulse">
-    <p>September S3 meetings from the demo tracker, scored against the M1–M10 schedule using every client email seen in grow@zotok.ai (one step per day). Stage S4/S5 is read from the email threads, so check it against the master tracker.</p>
+    <p>S3 meetings since 1 August from the demo tracker, scored against the M1–M10 schedule using every client email seen in grow@zotok.ai (one step per day). Stage S4/S5 is read from the email threads, so check it against the master tracker.</p>
     <div><h3 class="label" style="margin:0 0 8px">Email SLA by salesperson · last 30 days</h3>
     <div class="tablewrap"><table><thead><tr><th>Salesperson</th><th class="n">S3 meetings</th><th class="n">Emails sent / due</th><th class="n">Sent / due</th><th class="n">Overdue now</th><th class="n">Client replied</th><th class="n">No transcript</th><th class="n">Moved to S4+</th></tr></thead><tbody>${rowsRep}</tbody></table></div></div>
     <div><h3 class="label" style="margin:0 0 8px">S3 → S4 by account tier</h3>
